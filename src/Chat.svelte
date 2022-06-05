@@ -10,6 +10,9 @@
 
 <style lang="scss">
   .chat__wrapper {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     background: #000;
     border-radius: 8px;
     width: 100%;
