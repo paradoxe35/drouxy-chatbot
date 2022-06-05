@@ -1,0 +1,24 @@
+@charset "UTF-8";
+*,
+:after,
+:before {
+  box-sizing: border-box;
+}
+
+@font-face {
+  font-family: Poppins;
+  src: url(/Poppins-Regular.ttf);
+  font-weight: 400;
+  font-style: normal;
+}
+
+:root {
+  --primary-color: #5470fc;
+}
+body {
+  font-family: Poppins, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto,
+    Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+  background-color: rgba(0, 0, 0, 0.843);
+  color: #fff;
+  font-size: 14px;
+}
