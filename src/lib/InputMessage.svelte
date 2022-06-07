@@ -1,21 +1,46 @@
 <script lang="ts">
+  import { messages } from "../../store/store";
   import { fade } from "svelte/transition";
 
   let holdMic = false;
   let textInput = "";
 
   $: hasValue = textInput.trim().length > 0;
+
+  function sendMessage() {
+    if (!hasValue) return;
+    let messageText = textInput;
+    $messages = [
+      ...$messages,
+      {
+        text: messageText,
+        from_user: true,
+      },
+    ];
+    textInput = "";
+    window.setTimeout(() => {
+      $messages = [
+        ...$messages,
+        { text: messageText.split("").reverse().join("") },
+      ];
+    }, 2000);
+  }
 </script>
 
 <div class="input__content">
-  <div class="input__field">
+  <form class="input__field" on:submit|preventDefault={sendMessage}>
     <input type="text" placeholder="You can type here" bind:value={textInput} />
     {#if hasValue}
-      <button class="input__button" transition:fade={{ duration: 200 }}>
+      <button
+        on:click={sendMessage}
+        type="button"
+        class="input__button"
+        transition:fade={{ duration: 200 }}
+      >
         Send
       </button>
     {/if}
-  </div>
+  </form>
   <div
     class:mic__hold={holdMic}
     class="input__mic"
