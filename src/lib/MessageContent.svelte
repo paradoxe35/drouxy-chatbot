@@ -1,6 +1,5 @@
 <script lang="ts">
   import { messages } from "../../store/store";
-
   function swimrotate(_node, { delay = 0, duration = 200, right = false }) {
     return {
       delay,
@@ -22,7 +21,9 @@
   {#each $messages as message, index (index)}
     <div class={`message__items ${message.from_user ? "message__user" : ""}`}>
       {#if !message.from_user}
-        <img src="/msg-icon.png" class="message__item-img" alt="Icon" />
+        <div class={`message__item-img`}>
+          <img src="/msg-icon.png" alt="Icon" />
+        </div>
         <div class="message__item" in:swimrotate>
           {message.text}
         </div>
@@ -58,10 +59,50 @@
   }
 
   .message__items .message__item-img {
+    position: relative;
     width: 50px;
     height: 50px;
     margin-top: -15px;
     border-radius: 50%;
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    &:before,
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      top: -3px;
+      left: 0;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      border: solid rgba(131, 141, 255, 0.696);
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      opacity: 0;
+      transition: all 0.25s ease;
+    }
+
+    &.waving:before {
+      animation-name: social-button-beat;
+      animation-duration: 1s;
+      animation-timing-function: linear;
+      animation-delay: 0.5s;
+      animation-fill-mode: both;
+      animation-iteration-count: infinite;
+    }
+    &.waving:after {
+      animation-name: social-button-beat;
+      animation-duration: 1.5s;
+      animation-delay: 0s;
+      animation-fill-mode: both;
+      animation-timing-function: linear;
+      animation-iteration-count: infinite;
+    }
   }
   .message__items.message__user {
     align-self: flex-end;
@@ -86,5 +127,26 @@
     --raduis: 18px;
     border-radius: var(--raduis);
     border-top-left-radius: 0;
+  }
+
+  @keyframes social-button-beat {
+    0% {
+      opacity: 0;
+      transform: scale(0);
+    }
+
+    30% {
+      opacity: 0.6;
+      transform: scale(0.6);
+    }
+
+    70% {
+      opacity: 0;
+      transform: scale(1);
+    }
+
+    100% {
+      opacity: 0;
+    }
   }
 </style>
