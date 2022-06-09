@@ -7,10 +7,10 @@
   let textInput = "";
   const r_controller = RecorderController;
 
-  $: hasValue = textInput.trim().length > 0;
+  $: hasTextValue = textInput.trim().length > 0;
 
   function sendMessage() {
-    if (!hasValue) return;
+    if (!hasTextValue) return;
     let messageText = textInput;
     $messages = [
       ...$messages,
@@ -46,7 +46,13 @@
   /**
    * When user stop recording, send the audio blob to the server
    */
-  r_controller.onRecorded((blob) => {});
+  r_controller.onRecorded((blob) => {
+    console.log("onRecorded", blob);
+  });
+
+  r_controller.onSequentialize(({ blob }) => {
+    console.log("onSequentialize", blob);
+  });
 
   /**
    * notify store about voice controller request
@@ -59,7 +65,7 @@
 <div class="input__content">
   <form class="input__field" on:submit|preventDefault={sendMessage}>
     <input type="text" placeholder="You can type here" bind:value={textInput} />
-    {#if hasValue}
+    {#if hasTextValue}
       <button
         on:click={sendMessage}
         type="button"

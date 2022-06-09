@@ -1,5 +1,5 @@
 import InlineWorker from "../../utils/inline-worker";
-import { defaultMicrophoneConfig } from "./constants";
+import { defaultMicrophoneConfig, EXPORT_MIME_TYPE } from "./constants";
 
 class Microphone {
   config: any;
@@ -236,7 +236,7 @@ class Microphone {
     this.worker.postMessage({ command: "getBuffer" });
   }
 
-  exportWAV(cb, mimeType) {
+  exportWAV(cb, mimeType = EXPORT_MIME_TYPE) {
     mimeType = mimeType || this.config.mimeType;
     cb = cb || this.config.callback;
 

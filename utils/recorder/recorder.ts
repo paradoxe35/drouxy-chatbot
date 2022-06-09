@@ -82,14 +82,23 @@ class Recorder implements IRecorder {
     });
   }
 
+  export(): Promise<IRecorder.RecorderResult> {
+    return new Promise((resolve) => {
+      this.audioRecorder.getBuffer((buffer, sampleRate) => {
+        this.audioRecorder.exportWAV((blob) =>
+          resolve({ buffer, blob, sampleRate })
+        );
+      });
+    });
+  }
+
   stop() {
     return new Promise<IRecorder.RecorderResult>((resolve) => {
       this.audioRecorder.stop();
 
       this.audioRecorder.getBuffer((buffer, sampleRate) => {
-        this.audioRecorder.exportWAV(
-          (blob) => resolve({ buffer, blob, sampleRate }),
-          "audio/wav"
+        this.audioRecorder.exportWAV((blob) =>
+          resolve({ buffer, blob, sampleRate })
         );
       });
     });
