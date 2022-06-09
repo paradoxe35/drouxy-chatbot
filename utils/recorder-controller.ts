@@ -187,15 +187,13 @@ export default class RecorderController {
     // make some clean up
     this.recorder.setOnAnalysed(null);
     // get all sequentializer blobs and stop the sequentializer
-    await new Promise((resolve) => setTimeout(resolve, 100));
+    await new Promise((resolve) => setTimeout(resolve, 500));
     const blobSequentializer = await this.exportSequentializerBlobs();
     this.stopSequentializer();
 
     // stop the recorder
     const recordResult = await this.recorder.stop();
     this.started_recording_time = 0;
-
-    console.log(blobSequentializer);
 
     // call the callbacks
     this.onRecordedCallbacks.forEach((callback) => {
