@@ -1,17 +1,53 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { animatedCanvas } from "../../utils/canvas-curve";
+  import {
+    animatedCanvas,
+    IAnimatedCanvasConfig,
+  } from "../../utils/canvas-curve";
   import { fade } from "svelte/transition";
   import RecorderController from "../../utils/recorder-controller";
 
   onMount(() => {
+    const MAX_rgB_VALUE = 150;
+    const MIN_rgB_VALUE = 97;
+    const MAX_rgB_VALUE_DIFF = MAX_rgB_VALUE - MIN_rgB_VALUE;
+    const animatedCanvasConfig: IAnimatedCanvasConfig = {
+      shadowColor: { rgB: MIN_rgB_VALUE },
+    };
+
+    const analyserHistory = {
+      lastHigh: 0,
+      currentValue: 0,
+      clearTimeoutId: 0,
+    };
+
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
-    const cancelDrawLoop = animatedCanvas(canvas, ctx);
+    const cancelDrawLoop = animatedCanvas(canvas, ctx, animatedCanvasConfig);
 
     // on analyse microphone data from Recorder
-    RecorderController.onAnalysed((data, lineTo) => {
-      console.log(data, lineTo);
+    RecorderController.onAnalysed(({ data, lineTo }) => {
+      if (!lineTo) return;
+      for (let i = 0; i < data.length; i++) {
+        if (data[i] > lineTo || !lineTo) continue;
+        const v = (data[i] * 10) / lineTo;
+        const add = (v * MAX_rgB_VALUE_DIFF) / 10;
+        const new_rgB = MIN_rgB_VALUE + add * 2.5;
+        animatedCanvasConfig.shadowColor.rgB = new_rgB;
+
+        // if (new_rgB > analyserHistory.lastHigh) {
+        //   clearTimeout(analyserHistory.clearTimeoutId);
+        //   animatedCanvasConfig.shadowColor.rgB = new_rgB;
+        //   analyserHistory.lastHigh = new_rgB;
+
+        //   analyserHistory.clearTimeoutId = setTimeout(() => {
+        //     animatedCanvasConfig.shadowColor.rgB = analyserHistory.currentValue;
+        //     analyserHistory.lastHigh = analyserHistory.currentValue;
+        //   }, 400);
+        // } else {
+        //   analyserHistory.lastHigh = new_rgB;
+        // }
+      }
     });
 
     return () => {

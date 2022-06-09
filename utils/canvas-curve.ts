@@ -1,6 +1,11 @@
+export type IAnimatedCanvasConfig = {
+  shadowColor: { rgB: number };
+};
+
 export function animatedCanvas(
   canvas: HTMLCanvasElement,
-  ctx: CanvasRenderingContext2D
+  ctx: CanvasRenderingContext2D,
+  config?: IAnimatedCanvasConfig
 ) {
   const animationFrameId: { value: null | number } = { value: null };
   const cancelDrawLoop = { value: false };
@@ -11,7 +16,11 @@ export function animatedCanvas(
   };
   const radius = (canvas.width / 2) * 0.5;
   let phasex = { value: 1.2 };
-  let shadowColor = "rgba(32, 0, 97, 0.978)";
+
+  let shadowColor = () => {
+    let rgB = +config?.shadowColor?.rgB || 97;
+    return `rgba(32, 0, ${rgB}, 0.978)`;
+  };
 
   const gradient = ctx.createLinearGradient(0, 0, center.x * 3, center.y * 0.9);
   gradient.addColorStop(0, "#3fa3f6");
@@ -123,7 +132,7 @@ export function animatedCanvas(
       (pts[cycle(-1, points)].y + pts[0].y) / 2
     );
     ctx.lineWidth = k === 0 ? 16 : 3;
-    ctx.shadowColor = shadowColor;
+    ctx.shadowColor = shadowColor();
     ctx.strokeStyle = fillStyle;
     ctx.shadowBlur = 45;
 

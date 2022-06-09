@@ -1,6 +1,9 @@
 import Recorder from "./recorder";
 import { audio_options, mediaStreamConstraints } from "./recorder/constants";
 
+type IAnalysed = { data: number[]; lineTo: number };
+type IOnAnalysed = (datas: IAnalysed) => void;
+
 export default class RecorderController {
   private static audioContext: AudioContext;
 
@@ -12,7 +15,7 @@ export default class RecorderController {
 
   private static onRecordedCallbacks: Array<(blob: Blob) => void> = [];
 
-  private static _onAnalysed: (data: number[], lineTo: number) => void;
+  private static _onAnalysed: IOnAnalysed;
 
   /**
    * This must be called before any other method and only once.
@@ -39,7 +42,7 @@ export default class RecorderController {
     this.onRecordedCallbacks.push(callback);
   }
 
-  static onAnalysed(handler: (data: number[], lineTo: number) => void) {
+  static onAnalysed(handler: IOnAnalysed) {
     this._onAnalysed = handler;
   }
 
@@ -66,9 +69,9 @@ export default class RecorderController {
     return this.mediaStream;
   }
 
-  private static _updateAnalysers(data: number[], lineTo: number) {
+  private static _updateAnalysers(datas: IAnalysed) {
     if (this._onAnalysed) {
-      this._onAnalysed(data, lineTo);
+      this._onAnalysed(datas);
     }
   }
 
@@ -87,4 +90,6 @@ export default class RecorderController {
     this.started_recording_time = 0;
     this.onRecordedCallbacks.forEach((callback) => callback(recordResult.blob));
   }
+
+  static async sequentialize() {}
 }
