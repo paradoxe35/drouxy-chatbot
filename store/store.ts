@@ -18,3 +18,14 @@ export const messages = writable<Message[]>([
     text: "Hello 👋, I am Elwa. Before we start, tell me your name.",
   },
 ]);
+
+function createVoiceController() {
+  const { subscribe, set } = writable<boolean>(false);
+
+  return {
+    subscribe,
+    activate: (status: boolean) => set(status),
+  };
+}
+
+export const voiceController = createVoiceController();

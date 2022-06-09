@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { messages } from "../../store/store";
+  import { messages, voiceController } from "../../store/store";
   import { fade } from "svelte/transition";
 
   let holdMic = false;
@@ -24,6 +24,13 @@
         { text: messageText.split("").reverse().join("") },
       ];
     }, 2000);
+  }
+
+  /**
+   * notify store about voice controller request
+   */
+  $: {
+    voiceController.activate(holdMic);
   }
 </script>
 
@@ -59,6 +66,7 @@
 <style lang="scss">
   .input__content {
     position: relative;
+    z-index: 6;
     display: flex;
     flex-direction: row;
     height: max-content;

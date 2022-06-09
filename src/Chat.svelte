@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { voiceController } from "../store/store";
   import InputMessage from "./lib/InputMessage.svelte";
   import MessageContent from "./lib/MessageContent.svelte";
   import VoiceSpeech from "./lib/VoiceSpeech.svelte";
@@ -7,7 +8,9 @@
 <div class="chat__wrapper">
   <MessageContent />
   <InputMessage />
-  <VoiceSpeech />
+  {#if $voiceController}
+    <VoiceSpeech />
+  {/if}
 </div>
 
 <style lang="scss">
