@@ -9,7 +9,7 @@
 
   onMount(() => {
     const MAX_rgB_VALUE = 150;
-    const MIN_rgB_VALUE = 97;
+    const MIN_rgB_VALUE = 77;
     const MAX_rgB_VALUE_DIFF = MAX_rgB_VALUE - MIN_rgB_VALUE;
     const AMPLIFIER = 2.5;
     const animatedCanvasConfig: IAnimatedCanvasConfig = {
