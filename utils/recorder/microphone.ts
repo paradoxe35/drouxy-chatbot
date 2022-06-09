@@ -1,11 +1,5 @@
-/* eslint-disable */
-import InlineWorker from "inline-worker";
-
-const defaultConfig = {
-  bufferLen: 4096,
-  numChannels: 1,
-  mimeType: "audio/wav",
-};
+import InlineWorker from "../../utils/inline-worker";
+import { defaultMicrophoneConfig } from "./constants";
 
 class Microphone {
   config: any;
@@ -17,7 +11,7 @@ class Microphone {
   static forceDownload: (blob: any, filename: any) => void;
 
   constructor(source, config?: any) {
-    this.config = Object.assign({}, defaultConfig, config);
+    this.config = Object.assign({}, defaultMicrophoneConfig, config);
 
     this.recording = false;
 

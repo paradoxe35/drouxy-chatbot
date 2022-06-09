@@ -1,9 +1,11 @@
 <script lang="ts">
   import { messages, voiceController } from "../../store/store";
   import { fade } from "svelte/transition";
+  import RecorderController from "../../utils/recorder-controller";
 
   let holdMic = false;
   let textInput = "";
+  const r_controller = RecorderController;
 
   $: hasValue = textInput.trim().length > 0;
 
@@ -24,6 +26,18 @@
         { text: messageText.split("").reverse().join("") },
       ];
     }, 2000);
+  }
+
+  function handleMicClick(status: boolean) {
+    return async () => {
+      const can_record = await r_controller.getUserMedia();
+      if (!can_record) return;
+
+      if (status) await r_controller.startRecording();
+      else await r_controller.stopRecording();
+
+      holdMic = status;
+    };
   }
 
   /**
@@ -51,9 +65,9 @@
   <div
     class:mic__hold={holdMic}
     class="input__mic"
-    on:mousedown={() => (holdMic = true)}
-    on:mouseup={() => (holdMic = false)}
-    on:mouseleave={() => (holdMic = false)}
+    on:mousedown={handleMicClick(true)}
+    on:mouseup={handleMicClick(false)}
+    on:mouseleave={handleMicClick(false)}
   >
     <svg class="input__mic-icon" viewBox="0 0 24 24">
       <path

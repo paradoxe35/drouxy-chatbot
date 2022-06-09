@@ -2,11 +2,17 @@
   import { onMount } from "svelte";
   import { animatedCanvas } from "../../utils/canvas-curve";
   import { fade } from "svelte/transition";
+  import RecorderController from "../../utils/recorder-controller";
 
   onMount(() => {
     const canvas = document.querySelector("canvas");
     const ctx = canvas.getContext("2d");
     const cancelDrawLoop = animatedCanvas(canvas, ctx);
+
+    // on analyse microphone data from Recorder
+    RecorderController.onAnalysed((data, lineTo) => {
+      console.log(data, lineTo);
+    });
 
     return () => {
       cancelDrawLoop();

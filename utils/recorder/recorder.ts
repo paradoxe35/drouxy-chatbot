@@ -1,3 +1,4 @@
+import type IRecorder from "./index.d";
 import Microphone from "./microphone";
 
 const defaultConfig = {
@@ -5,22 +6,26 @@ const defaultConfig = {
   onAnalysed: null,
 };
 
-class Recorder {
+class Recorder implements IRecorder {
   config: { nFrequencyBars: number; onAnalysed: any };
   static download: (blob: any, filename?: string) => void;
   audioContext: any;
   audioInput: any;
   realAudioInput: any;
   inputPoint: any;
-  audioRecorder: any;
+  audioRecorder: Microphone;
   rafID: any;
   analyserContext: any;
   recIndex: number;
-  stream: any;
+  stream: MediaStream;
   analyserNode: any;
+  private cancelRequestAnimationFrame: number;
 
-  constructor(audioContext: AudioContext, config = {}) {
-    this.config = Object.assign({}, defaultConfig, config);
+  constructor(
+    audioContext: AudioContext,
+    config?: Omit<typeof defaultConfig, "onAnalysed">
+  ) {
+    this.config = Object.assign({}, defaultConfig, config || {});
 
     this.audioContext = audioContext;
     this.audioInput = null;
@@ -35,7 +40,7 @@ class Recorder {
     this.updateAnalysers = this.updateAnalysers.bind(this);
   }
 
-  init(stream) {
+  init(stream: MediaStream) {
     return new Promise<void>((resolve) => {
       this.inputPoint = this.audioContext.createGain();
 
@@ -64,7 +69,7 @@ class Recorder {
   }
 
   start() {
-    return new Promise((resolve, reject) => {
+    return new Promise<MediaStream>((resolve, reject) => {
       if (!this.audioRecorder) {
         reject("Not currently recording");
         return;
@@ -78,12 +83,13 @@ class Recorder {
   }
 
   stop() {
-    return new Promise((resolve) => {
+    return new Promise<IRecorder.RecorderResult>((resolve) => {
       this.audioRecorder.stop();
 
       this.audioRecorder.getBuffer((buffer, sampleRate) => {
-        this.audioRecorder.exportWAV((blob) =>
-          resolve({ buffer, blob, sampleRate })
+        this.audioRecorder.exportWAV(
+          (blob) => resolve({ buffer, blob, sampleRate }),
+          "audio/wav"
         );
       });
     });
@@ -91,7 +97,9 @@ class Recorder {
 
   updateAnalysers() {
     if (this.config.onAnalysed) {
-      requestAnimationFrame(this.updateAnalysers);
+      this.cancelRequestAnimationFrame = requestAnimationFrame(
+        this.updateAnalysers
+      );
 
       const freqByteData = new Uint8Array(this.analyserNode.frequencyBinCount);
 
@@ -113,6 +121,8 @@ class Recorder {
       }
 
       this.config.onAnalysed({ data, lineTo: lastNonZero });
+    } else if (this.cancelRequestAnimationFrame && this.config.onAnalysed) {
+      cancelAnimationFrame(this.cancelRequestAnimationFrame);
     }
   }
 
