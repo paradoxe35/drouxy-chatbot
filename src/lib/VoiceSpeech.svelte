@@ -11,14 +11,9 @@
     const MAX_rgB_VALUE = 150;
     const MIN_rgB_VALUE = 97;
     const MAX_rgB_VALUE_DIFF = MAX_rgB_VALUE - MIN_rgB_VALUE;
+    const AMPLIFIER = 2.5;
     const animatedCanvasConfig: IAnimatedCanvasConfig = {
       shadowColor: { rgB: MIN_rgB_VALUE },
-    };
-
-    const analyserHistory = {
-      lastHigh: 0,
-      currentValue: 0,
-      clearTimeoutId: 0,
     };
 
     const canvas = document.querySelector("canvas");
@@ -32,21 +27,8 @@
         if (data[i] > lineTo || !lineTo) continue;
         const v = (data[i] * 10) / lineTo;
         const add = (v * MAX_rgB_VALUE_DIFF) / 10;
-        const new_rgB = MIN_rgB_VALUE + add * 2.5;
+        const new_rgB = MIN_rgB_VALUE + add * AMPLIFIER;
         animatedCanvasConfig.shadowColor.rgB = new_rgB;
-
-        // if (new_rgB > analyserHistory.lastHigh) {
-        //   clearTimeout(analyserHistory.clearTimeoutId);
-        //   animatedCanvasConfig.shadowColor.rgB = new_rgB;
-        //   analyserHistory.lastHigh = new_rgB;
-
-        //   analyserHistory.clearTimeoutId = setTimeout(() => {
-        //     animatedCanvasConfig.shadowColor.rgB = analyserHistory.currentValue;
-        //     analyserHistory.lastHigh = analyserHistory.currentValue;
-        //   }, 400);
-        // } else {
-        //   analyserHistory.lastHigh = new_rgB;
-        // }
       }
     });
 
