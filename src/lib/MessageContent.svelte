@@ -1,27 +1,29 @@
 <script lang="ts">
-  import { messages } from "../../store/store";
-  function swimrotate(_node, { delay = 0, duration = 200, right = false }) {
-    return {
-      delay,
-      duration,
-      css: (t) => {
-        const rotation = t * 0.05 - 0.05;
-        const scale = Math.min(t + 0.2, 1);
-        return `
-        transform-origin: ${right ? "bottom right" : "top left"};
-        transform: scale(${scale}) rotate(${
-          right ? rotation : Math.abs(rotation)
-        }turn);`;
-      },
-    };
-  }
+  import { isBotTyping } from "../../store/store";
+  import { messages } from "../../store/messages";
+  import { swimrotate } from "../../utils/animations/transitions";
+  import { onMount } from "svelte";
+  import { fade } from "svelte/transition";
+
+  onMount(() => {
+    window.setTimeout(() => {
+      isBotTyping.activate(true);
+    }, 1000);
+
+    window.setTimeout(() => {
+      isBotTyping.activate(false);
+      messages.addMessage({
+        text: "How can I help you?",
+      });
+    }, 5000);
+  });
 </script>
 
 <div class="message__content">
   {#each $messages as message, index (index)}
     <div class={`message__items ${message.from_user ? "message__user" : ""}`}>
       {#if !message.from_user}
-        <div class={`message__item-img`}>
+        <div class={`message__item-img`} out:fade>
           <img src="/msg-icon.png" alt="Icon" />
         </div>
         <div class="message__item" in:swimrotate>
@@ -34,6 +36,14 @@
       {/if}
     </div>
   {/each}
+
+  {#if $isBotTyping}
+    <div class={`message__items`}>
+      <div class={`message__item-img waving`}>
+        <img src="/msg-icon.png" alt="Icon" />
+      </div>
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">
@@ -74,7 +84,7 @@
       content: "";
       display: block;
       position: absolute;
-      top: -3px;
+      top: 0;
       left: 0;
       z-index: 1;
       width: 100%;
@@ -88,7 +98,7 @@
     }
 
     &.waving:before {
-      animation-name: social-button-beat;
+      animation-name: wave-beat;
       animation-duration: 1s;
       animation-timing-function: linear;
       animation-delay: 0.5s;
@@ -96,7 +106,7 @@
       animation-iteration-count: infinite;
     }
     &.waving:after {
-      animation-name: social-button-beat;
+      animation-name: wave-beat;
       animation-duration: 1.5s;
       animation-delay: 0s;
       animation-fill-mode: both;
@@ -129,7 +139,7 @@
     border-top-left-radius: 0;
   }
 
-  @keyframes social-button-beat {
+  @keyframes wave-beat {
     0% {
       opacity: 0;
       transform: scale(0);

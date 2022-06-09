@@ -1,5 +1,6 @@
 <script lang="ts">
-  import { messages, voiceController } from "../../store/store";
+  import { messages } from "../../store/messages";
+  import { voiceController } from "../../store/store";
   import { fade } from "svelte/transition";
   import RecorderController from "../../utils/recorder-controller";
 
@@ -12,19 +13,13 @@
   function sendMessage() {
     if (!hasTextValue) return;
     let messageText = textInput;
-    $messages = [
-      ...$messages,
-      {
-        text: messageText,
-        from_user: true,
-      },
-    ];
+    messages.addMessage({
+      text: messageText,
+      from_user: true,
+    });
     textInput = "";
     window.setTimeout(() => {
-      $messages = [
-        ...$messages,
-        { text: messageText.split("").reverse().join("") },
-      ];
+      messages.addMessage({ text: messageText.split("").reverse().join("") });
     }, 2000);
   }
 
