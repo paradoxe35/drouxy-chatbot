@@ -91,5 +91,9 @@ export default class RecorderController {
     this.onRecordedCallbacks.forEach((callback) => callback(recordResult.blob));
   }
 
+  static async download(blob: Blob) {
+    Recorder.download(blob);
+  }
+
   static async sequentialize() {}
 }

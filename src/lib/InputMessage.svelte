@@ -29,6 +29,9 @@
   }
 
   function handleMicClick(status: boolean) {
+    /**
+     * Start recording or stop recording
+     */
     return async () => {
       const can_record = await r_controller.getUserMedia();
       if (!can_record) return;
@@ -39,6 +42,11 @@
       holdMic = status;
     };
   }
+
+  /**
+   * When user stop recording, send the audio blob to the server
+   */
+  r_controller.onRecorded((blob) => {});
 
   /**
    * notify store about voice controller request
