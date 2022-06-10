@@ -33,7 +33,7 @@ export default class RecorderController {
     data: Uint8Array;
   };
 
-  private static _onSequentializeCallback: sequentializeCallback[];
+  private static _onSequentializeCallback: sequentializeCallback[] = [];
 
   private static canSequentialize: boolean = false;
 
