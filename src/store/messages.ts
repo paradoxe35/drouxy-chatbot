@@ -21,7 +21,7 @@ const defaultMessages = [
 ];
 
 function createMessageStore() {
-  const { subscribe, set, update } = writable<Message[]>(defaultMessages);
+  const { subscribe, update } = writable<Message[]>(defaultMessages);
 
   return {
     subscribe,
@@ -43,7 +43,7 @@ function createPendingSequenceMessageCounterStore() {
       update((count) => count + 1);
     },
     decrement: () => {
-      update((count) => count - 1);
+      update((count) => (!count ? count : count - 1));
     },
     reset: () => set(0),
   };

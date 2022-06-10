@@ -17,6 +17,7 @@
 
   let holdMic = false;
   let textInput = "";
+  let hasRecorded = false;
   const r_controller = RecorderController;
 
   $: hasTextValue = textInput.trim().length > 0;
@@ -46,8 +47,36 @@
     };
   }
 
-  function handleRecorded(result: IRecorder.RecorderResult) {
-    console.log("handleRecorded", result.blob);
+  /** handle sequential recording */
+  function handleSequentialRecording(result: IRecorder.RecorderResult) {
+    console.log("handleSequentialRecording", result.blob);
+    hasRecorded = true;
+    pendingSequenceMessageCounter.increment();
+
+    socket.sendSpeechRecorded({
+      sampleRate: result.sampleRate,
+      blob: result.blob,
+      mimeType: EXPORT_MIME_TYPE,
+      numChannels: AUDIO_NUM_CHANNELS,
+    });
+  }
+
+  r_controller.onSequentialize(debounce(handleSequentialRecording, 100));
+
+  /* When user stop recording, send the audio blob to the server */
+  function handleEndRecording(result: IRecorder.RecorderResult) {
+    /**
+     * IF there is message from sequential recording,
+     * and no last sequency which was not captured by onSequentialize listener
+     */
+    if ($pendingSequenceMessageCounter !== 0 && !result.lastSequence) {
+      return;
+    } else if (result.lastSequence) {
+      result.blob = result.lastSequence;
+    }
+
+    hasRecorded = true;
+    console.log("handleEndRecording", result.blob);
 
     pendingSequenceMessageCounter.increment();
 
@@ -59,16 +88,14 @@
     });
   }
 
-  /* When user stop recording, send the audio blob to the server */
-  // r_controller.onRecorded(debounce(handleRecorded, 500));
-  r_controller.onSequentialize(debounce(handleRecorded, 100));
+  r_controller.onRecordingEnd(debounce(handleEndRecording, 100));
 
   // Get live message from socket
   socket.liveMessageEvent((data) => {
-    pendingSequenceMessageCounter.decrement();
     if (data.error === 0) {
       userLiveMessage.addMessage(data.final.text);
     }
+    pendingSequenceMessageCounter.decrement();
   });
 
   /**
@@ -79,10 +106,9 @@
   }
 
   // Close speechMode when pendingSequenceMessageCounter is 0 and holdMic is false
-  $: if ($pendingSequenceMessageCounter === 0 && !holdMic) {
-    console.log($pendingSequenceMessageCounter);
-
+  $: if ($pendingSequenceMessageCounter === 0 && !holdMic && hasRecorded) {
     const wait_time = 1000;
+    hasRecorded = false;
     setTimeout(() => speechMode.activate(false), wait_time);
 
     const live_messages = userLiveMessage.getMessages();

@@ -33,7 +33,7 @@ class Microphone {
     this.node.onaudioprocess = (e) => {
       if (!this.recording) return;
 
-      var buffer = [];
+      var buffer: any[] = [];
       for (var channel = 0; channel < this.config.numChannels; channel++) {
         buffer.push(e.inputBuffer.getChannelData(channel));
       }
@@ -49,10 +49,11 @@ class Microphone {
     let self = {};
     this.worker = new InlineWorker(function () {
       let recLength = 0,
-        recBuffers = [],
+        recBuffers: any[] = [],
         sampleRate,
         numChannels;
 
+      // @ts-ignore
       this.onmessage = function (e) {
         switch (e.data.command) {
           case "init":
@@ -87,7 +88,7 @@ class Microphone {
       }
 
       function exportWAV(type) {
-        let buffers = [];
+        let buffers: any[] = [];
         for (let channel = 0; channel < numChannels; channel++) {
           buffers.push(mergeBuffers(recBuffers[channel], recLength));
         }
@@ -99,15 +100,16 @@ class Microphone {
         }
         let dataview = encodeWAV(interleaved);
         let audioBlob = new Blob([dataview], { type: type });
-
+        // @ts-ignore
         this.postMessage({ command: "exportWAV", data: audioBlob });
       }
 
       function getBuffer() {
-        let buffers = [];
+        let buffers: any[] = [];
         for (let channel = 0; channel < numChannels; channel++) {
           buffers.push(mergeBuffers(recBuffers[channel], recLength));
         }
+        // @ts-ignore
         this.postMessage({ command: "getBuffer", data: buffers, sampleRate });
       }
 

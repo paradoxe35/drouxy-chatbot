@@ -13,6 +13,7 @@ export function concatenateBlobs(
     }
     const reader = new FileReader();
     reader.onload = function (event) {
+      // @ts-ignore
       buffers.push(event.target.result);
       index++;
       readAsArrayBuffer();
@@ -35,6 +36,7 @@ export function concatenateBlobs(
   function concatenateBuffers() {
     let byteLength = 0;
     buffers.forEach(function (buffer) {
+      // @ts-ignore
       byteLength += buffer.byteLength;
     });
 

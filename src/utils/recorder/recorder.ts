@@ -17,9 +17,9 @@ class Recorder implements IRecorder {
   rafID: any;
   analyserContext: any;
   recIndex: number;
-  stream: MediaStream;
+  stream: MediaStream | null;
   analyserNode: any;
-  private cancelRequestAnimationFrame: number;
+  private cancelRequestAnimationFrame: number | undefined;
 
   constructor(
     audioContext: AudioContext,
@@ -31,6 +31,7 @@ class Recorder implements IRecorder {
     this.audioInput = null;
     this.realAudioInput = null;
     this.inputPoint = null;
+    // @ts-ignore
     this.audioRecorder = null;
     this.rafID = null;
     this.analyserContext = null;
@@ -78,7 +79,7 @@ class Recorder implements IRecorder {
       this.audioRecorder.clear();
       this.audioRecorder.record();
 
-      resolve(this.stream);
+      resolve(this.stream!);
     });
   }
 

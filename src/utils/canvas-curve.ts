@@ -5,7 +5,7 @@ export type IAnimatedCanvasConfig = {
 export function animatedCanvas(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
-  config?: IAnimatedCanvasConfig
+  config: IAnimatedCanvasConfig
 ) {
   const animationFrameId: { value: null | number } = { value: null };
   const cancelDrawLoop = { value: false };
@@ -39,7 +39,7 @@ export function animatedCanvas(
   gradient3.addColorStop(0, "#3fa3f6");
   gradient3.addColorStop(1, "#5927f5");
 
-  const circles = [];
+  const circles: any[] = [];
   const gradients = [gradient, gradient2, gradient3];
   const points = 12;
   const PI = Math.PI;
@@ -50,7 +50,7 @@ export function animatedCanvas(
   const showPoints: boolean = false;
 
   for (var idx = 0; idx <= gradients.length - 1; idx++) {
-    let swingpoints = [];
+    let swingpoints: any[] = [];
     let radian = 0;
 
     for (var i = 0; i < points; i++) {

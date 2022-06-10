@@ -24,5 +24,5 @@ export const defaultMicrophoneConfig = {
 
 export const noiseCaptureConfig = {
   min_decibels: -40, // Noise detection sensitivity
-  max_blank_time: 1000, // Maximum time to consider a blank (ms)
+  max_blank_time: 500, // Maximum time to consider a blank (ms)
 };

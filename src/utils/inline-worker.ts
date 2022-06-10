@@ -1,6 +1,6 @@
 const WORKER_ENABLED = !!(window.URL && window.Blob && window.Worker);
 
-function InlineWorker(func, self) {
+function InlineWorker(this: any, func, self) {
   const _this = this;
   let functionBody;
 
@@ -27,6 +27,8 @@ function InlineWorker(func, self) {
   this.self.postMessage = postMessage;
 
   setTimeout(func.bind(self, self), 0);
+
+  return;
 }
 
 InlineWorker.prototype.postMessage = function postMessage(data) {

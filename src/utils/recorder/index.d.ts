@@ -18,6 +18,7 @@ declare namespace IRecorder {
 
   interface RecorderResult {
     blob: Blob;
+    lastSequence?: Blob;
     buffer: Float32Array[];
     sampleRate?: number;
   }

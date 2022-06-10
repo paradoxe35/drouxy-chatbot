@@ -15,8 +15,8 @@
     };
 
     const canvas = document.querySelector("canvas");
-    const ctx = canvas.getContext("2d");
-    const cancelDrawLoop = animatedCanvas(canvas, ctx, animatedCanvasConfig);
+    const ctx = canvas!.getContext("2d")!;
+    const cancelDrawLoop = animatedCanvas(canvas!, ctx, animatedCanvasConfig);
 
     // on analyse microphone data from Recorder
     RecorderController.onAnalysed(({ data, lineTo }) => {

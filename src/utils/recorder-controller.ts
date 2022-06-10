@@ -20,11 +20,14 @@ export default class RecorderController {
 
   private static mediaStream: MediaStream;
 
+  // @ts-ignore
   private static started_recording_time: number;
 
-  private static onRecordedCallbacks: Array<
+  private static onRecordingEndCallbacks: Array<
     (data: IRecorder.RecorderResult) => void
   > = [];
+
+  private static onRecordingStartCallbacks: Array<() => void> = [];
 
   private static _onAnalysed: IOnAnalysed;
 
@@ -38,6 +41,8 @@ export default class RecorderController {
   private static canSequentialize: boolean = false;
 
   private static sequentializeBlobs: IRecorder.RecorderResult[] = [];
+
+  private static sequentializerStatus: SequentializerStatus;
 
   /**
    * This must be called before any other method and only once.
@@ -98,10 +103,16 @@ export default class RecorderController {
       analyser,
       data: new Uint8Array(analyser.frequencyBinCount),
     };
+
+    this.sequentializerStatus = new SequentializerStatus();
   }
 
-  static onRecorded(callback: (blob: IRecorder.RecorderResult) => void) {
-    this.onRecordedCallbacks.push(callback);
+  static onRecordingEnd(callback: (blob: IRecorder.RecorderResult) => void) {
+    this.onRecordingEndCallbacks.push(callback);
+  }
+
+  static onRecordingStart(callback: () => void) {
+    this.onRecordingStartCallbacks.push(callback);
   }
 
   static onAnalysed(handler: IOnAnalysed) {
@@ -111,7 +122,7 @@ export default class RecorderController {
   /**
    * Callback called only when a noise is detected,
    * NB: After the recording is stopped
-   * the onRecorded callback is called with the concatenated blobs from the sequentializer
+   * the onRecordingEnd callback is called with the concatenated blobs from the sequentializer
    */
   static onSequentialize(callback: sequentializeCallback) {
     this._onSequentialize = callback;
@@ -124,11 +135,12 @@ export default class RecorderController {
       concatenateBlobs(
         this.sequentializeBlobs.map(({ blob }) => blob),
         EXPORT_MIME_TYPE,
-        (blob) => ({
-          blob,
-          mimeType: EXPORT_MIME_TYPE,
-          sampleRate: this.sequentializeBlobs[0].sampleRate,
-        })
+        (blob) =>
+          resolve({
+            blob,
+            sampleRate: this.sequentializeBlobs[0].sampleRate,
+            buffer: [],
+          })
       );
     });
   }
@@ -141,7 +153,8 @@ export default class RecorderController {
     this.canSequentialize = true;
 
     const loop = async (time: number) => {
-      if (!this.canSequentialize) return;
+      if (!this.canSequentialize || !this.recorder.audioRecorder?.recording)
+        return;
       requestAnimationFrame(loop);
 
       analyser.getByteFrequencyData(data);
@@ -161,8 +174,13 @@ export default class RecorderController {
         // no noise detected
         triggered = true;
         if (this._onSequentialize) {
+          // eanable pending the exportation
+          this.sequentializerStatus.enableInPending();
+
           const audioData = await this.recorder.export();
           this.sequentializeBlobs.push(audioData);
+          // disable pending the exportation
+          this.sequentializerStatus.disableInPending();
           // clear all buffer
           this.recorder.audioRecorder.clear();
           this._onSequentialize(audioData);
@@ -177,12 +195,13 @@ export default class RecorderController {
   }
 
   private static _updateAnalysers(datas: IAnalysed) {
-    if (this._onAnalysed) {
+    if (this._onAnalysed && this.recorder.audioRecorder?.recording) {
       this._onAnalysed(datas);
     }
   }
 
   static async startRecording() {
+    await this.audioContext.resume();
     // set the analyser callback and start the Analysers auto update
     this.recorder.setOnAnalysed(this._updateAnalysers);
     this.recorder.updateAnalysers();
@@ -191,28 +210,61 @@ export default class RecorderController {
     // start the recorder
     await this.recorder.start();
     this.started_recording_time = Date.now();
+
+    this.onRecordingStartCallbacks.forEach((callback) => callback());
   }
 
   static async stopRecording() {
-    if (!this.recorder.audioRecorder?.recording) return;
     // make some clean up
     this.recorder.setOnAnalysed(null);
+
+    if (!this.recorder.audioRecorder?.recording) return;
     // get all sequentializer blobs and stop the sequentializer
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await this.sequentializerStatus.canExport();
     const blobSequentializer = await this.exportSequentializerBlobs();
     this.stopSequentializer();
+
+    console.log(blobSequentializer);
 
     // stop the recorder
     const recordResult = await this.recorder.stop();
     this.started_recording_time = 0;
 
     // call the callbacks
-    this.onRecordedCallbacks.forEach((callback) => {
+    this.onRecordingEndCallbacks.forEach((callback) => {
+      if (blobSequentializer) {
+        blobSequentializer.lastSequence = recordResult.blob;
+      }
       callback(blobSequentializer || recordResult);
     });
   }
 
   static async download(blob: Blob) {
     Recorder.download(blob);
+  }
+}
+
+class SequentializerStatus {
+  private pendingSequentializer: boolean = false;
+
+  enableInPending() {
+    this.pendingSequentializer = true;
+  }
+
+  disableInPending() {
+    this.pendingSequentializer = false;
+    window.dispatchEvent(new Event("disable-pending-sequentializer"));
+  }
+
+  async canExport() {
+    return new Promise<any>((resolve) => {
+      if (this.pendingSequentializer === false) {
+        resolve(true);
+      } else {
+        window.addEventListener("disable-pending-sequentializer", resolve, {
+          once: true,
+        });
+      }
+    });
   }
 }
