@@ -6,11 +6,11 @@ services:
     container_name: tts-en_us
     restart: always
     ports:
-      - "${TTS_EN_LOCAL_SERVER_PORT}:5002"
+      - "${TTS_EN_SERVER_PORT}:5002"
 
   tts-fr_fr:
     image: rhasspy/larynx:fr-fr
     container_name: tts-fr_fr
     restart: always
     ports:
-      - "${TTS_FR_LOCAL_SERVER_PORT}:5002"
+      - "${TTS_FR_SERVER_PORT}:5002"

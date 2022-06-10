@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "elwa-chat"
+version = "0.1.0"
+description = ""
+authors = ["Paradoxe Ngwasi <35149259+paradoxe35@users.noreply.github.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+websockets = "^10.3"
+Wave = "^0.0.2"
+python-dotenv = "^0.20.0"
+python-socketio = "^5.6.0"
+eventlet = "^0.33.1"
+
+[tool.poetry.dev-dependencies]
+autopep8 = "^1.6.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
