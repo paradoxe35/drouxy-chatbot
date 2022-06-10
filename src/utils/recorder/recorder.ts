@@ -8,17 +8,17 @@ const defaultConfig = {
 
 class Recorder implements IRecorder {
   config: { nFrequencyBars: number; onAnalysed: any };
-  static download: (blob: any, filename?: string) => void;
-  audioContext: any;
-  audioInput: any;
-  realAudioInput: any;
-  inputPoint: any;
+  static download: (blob: Blob, filename?: string) => void;
+  audioContext: AudioContext;
+  audioInput: MediaStreamAudioSourceNode | null;
+  realAudioInput: MediaStreamAudioSourceNode | null;
+  inputPoint: GainNode | null;
   audioRecorder: Microphone;
   rafID: any;
   analyserContext: any;
   recIndex: number;
   stream: MediaStream | null;
-  analyserNode: any;
+  analyserNode: AnalyserNode | undefined;
   private cancelRequestAnimationFrame: number | undefined;
 
   constructor(
@@ -49,7 +49,7 @@ class Recorder implements IRecorder {
 
       this.realAudioInput = this.audioContext.createMediaStreamSource(stream);
       this.audioInput = this.realAudioInput;
-      this.audioInput.connect(this.inputPoint);
+      this.audioInput?.connect(this.inputPoint);
 
       this.analyserNode = this.audioContext.createAnalyser();
       this.analyserNode.fftSize = 2048;
@@ -111,9 +111,11 @@ class Recorder implements IRecorder {
         this.updateAnalysers
       );
 
-      const freqByteData = new Uint8Array(this.analyserNode.frequencyBinCount);
+      const freqByteData = new Uint8Array(
+        this.analyserNode?.frequencyBinCount!
+      );
 
-      this.analyserNode.getByteFrequencyData(freqByteData);
+      this.analyserNode?.getByteFrequencyData(freqByteData);
 
       const data = new Array(255);
       let lastNonZero = 0;

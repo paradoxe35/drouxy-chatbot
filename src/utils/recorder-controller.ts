@@ -265,6 +265,12 @@ export default class RecorderController {
 
 class SequentializerStatus {
   private pendingSequentializer: boolean = false;
+  private eventTarget: EventTarget;
+  private eventName = "disable-pending-sequentializer";
+
+  constructor() {
+    this.eventTarget = new EventTarget();
+  }
 
   enableInPending() {
     this.pendingSequentializer = true;
@@ -272,7 +278,7 @@ class SequentializerStatus {
 
   disableInPending() {
     this.pendingSequentializer = false;
-    window.dispatchEvent(new Event("disable-pending-sequentializer"));
+    this.eventTarget.dispatchEvent(new Event(this.eventName));
   }
 
   async canExport() {
@@ -280,7 +286,7 @@ class SequentializerStatus {
       if (this.pendingSequentializer === false) {
         resolve(true);
       } else {
-        window.addEventListener("disable-pending-sequentializer", resolve, {
+        this.eventTarget.addEventListener(this.eventName, resolve, {
           once: true,
         });
       }
