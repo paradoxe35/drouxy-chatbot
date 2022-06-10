@@ -4,13 +4,13 @@ services:
   stt-en_us:
     image: alphacep/kaldi-en:latest
     container_name: stt-en_us
-    restart: always
+    restart: unless-stopped
     ports:
       - "${STT_EN_SERVER_PORT}:2700"
 
   stt-fr_fr:
     image: alphacep/kaldi-fr:latest
     container_name: stt-fr_fr
-    restart: always
+    restart: unless-stopped
     ports:
       - "${STT_FR_SERVER_PORT}:2700"

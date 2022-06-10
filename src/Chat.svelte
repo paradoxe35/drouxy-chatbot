@@ -1,17 +1,27 @@
 <script lang="ts">
-  import "./network/socket";
+  import socket from "./network/socket";
   import { speechMode } from "./store/store";
   import InputMessage from "./lib/InputMessage.svelte";
   import MessageContent from "./lib/MessageContent.svelte";
   import VoiceSpeech from "./lib/VoiceSpeech.svelte";
   import RecorderController from "./utils/recorder-controller";
   import { onMount } from "svelte";
+  import {
+    pendingSequenceMessageCounter,
+    userLiveMessage,
+  } from "./store/messages";
 
-  /**
-   * This must be called once
-   */
   onMount(() => {
+    /**
+     * This must be called once
+     */
     RecorderController.init();
+
+    // Clear all message store when socket connect failed
+    socket.io.on("connect_failed", () => {
+      userLiveMessage.reset();
+      pendingSequenceMessageCounter.reset();
+    });
   });
 </script>
 

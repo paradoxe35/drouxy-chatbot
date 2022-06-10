@@ -1,5 +1,9 @@
 <script lang="ts">
-  import { messages, userLiveMessage } from "../store/messages";
+  import {
+    messages,
+    pendingSequenceMessageCounter,
+    userLiveMessage,
+  } from "../store/messages";
   import { speechMode } from "../store/store";
   import { fade } from "svelte/transition";
   import RecorderController from "../utils/recorder-controller";
@@ -8,6 +12,8 @@
     AUDIO_NUM_CHANNELS,
     EXPORT_MIME_TYPE,
   } from "../utils/recorder/constants";
+  import { debounce } from "../utils/debounce";
+  import type IRecorder from "src/utils/recorder/index.d";
 
   let holdMic = false;
   let textInput = "";
@@ -40,50 +46,59 @@
     };
   }
 
-  /**
-   * When user stop recording, send the audio blob to the server
-   */
-  r_controller.onRecorded((result) => {
-    console.log("onRecorded", result.blob);
+  function handleRecorded(result: IRecorder.RecorderResult) {
+    console.log("handleRecorded", result.blob);
 
-    socket.sendBlob({
+    pendingSequenceMessageCounter.increment();
+
+    socket.sendSpeechRecorded({
       sampleRate: result.sampleRate,
       blob: result.blob,
       mimeType: EXPORT_MIME_TYPE,
       numChannels: AUDIO_NUM_CHANNELS,
     });
-  });
+  }
 
-  r_controller.onSequentialize(({ blob }) => {
-    console.log("onSequentialize", blob);
+  /* When user stop recording, send the audio blob to the server */
+  // r_controller.onRecorded(debounce(handleRecorded, 500));
+  r_controller.onSequentialize(debounce(handleRecorded, 100));
+
+  // Get live message from socket
+  socket.liveMessageEvent((data) => {
+    pendingSequenceMessageCounter.decrement();
+    if (data.error === 0) {
+      userLiveMessage.addMessage(data.final.text);
+    }
   });
 
   /**
    * notify store about voice controller request
    */
-  $: {
-    speechMode.activate(holdMic);
+  $: if (holdMic) {
+    speechMode.activate(true);
   }
 
-  // Mock user live messages
-  $: if (holdMic) {
-    setTimeout(() => {
-      userLiveMessage.addMessage("Hello");
-    }, 1000);
+  // Close speechMode when pendingSequenceMessageCounter is 0 and holdMic is false
+  $: if ($pendingSequenceMessageCounter === 0 && !holdMic) {
+    console.log($pendingSequenceMessageCounter);
 
-    setTimeout(() => {
-      userLiveMessage.addMessage("I am denis");
-    }, 1500);
+    const wait_time = 1000;
+    setTimeout(() => speechMode.activate(false), wait_time);
 
-    setTimeout(() => {
-      userLiveMessage.addMessage("How are you ?");
-    }, 2000);
-
-    setTimeout(() => {
-      userLiveMessage.addMessage("Love you ?");
-    }, 2500);
-  } else {
-    userLiveMessage.reset();
+    const live_messages = userLiveMessage.getMessages();
+    const msg = live_messages
+      .map((t) => t.text)
+      .join(" ")
+      .trim();
+    if (live_messages.length > 0 && msg.length > 0) {
+      setTimeout(() => {
+        messages.addMessage({
+          text: msg,
+          from_user: true,
+        });
+        userLiveMessage.reset();
+      }, wait_time + 500);
+    }
   }
 </script>
 

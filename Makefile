@@ -19,13 +19,13 @@ stt-server-docker:
 		up -d
 
 stt-server-en-docker:
-	docker-compose \
+	@docker-compose \
 		--env-file ./.env \
 		-f ./packages/server/docker-compose.stt.yml \
 		up stt-en_us -d
 
 stt-server-fr-docker:
-	docker-compose \
+	@docker-compose \
 		--env-file ./.env \
 		-f ./packages/server/docker-compose.stt.yml \
 		up stt-fr_fr -d

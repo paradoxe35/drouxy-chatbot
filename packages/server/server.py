@@ -3,6 +3,8 @@ import eventlet
 import socketio
 import env
 import wave
+from stt.client import stt_en
+import tempfile
 
 
 # get allowed origins from env.py and parse it to a list
@@ -20,12 +22,27 @@ def connect(sid, environ):
 
 @sio.on('recording')
 def recording(sid, data):
-    with wave.open('demo.wav', 'wb') as f:
-        f.setsampwidth(2)
-        f.setnchannels(data['numChannels'])
-        f.setframerate(data['sampleRate'])
-        f.writeframes(data['blob'])
-    print('message ', data['sampleRate'])
+    try:
+        with tempfile.NamedTemporaryFile() as tmpfile:
+            with wave.open(tmpfile.name, 'wb') as wavf:
+                wavf.setsampwidth(2)
+                wavf.setnchannels(data['numChannels'])
+                wavf.setframerate(data['sampleRate'])
+                wavf.writeframes(data['blob'])
+            result, last_partial = stt_en(tmpfile.name)
+            data = {
+                'error': 0,
+                'final': result,
+                'last_partial': last_partial
+            }
+            sio.emit('live-message', data, to=sid)
+    except Exception as e:
+        data = {
+            'error': 1,
+            'final': None,
+            'last_partial': None
+        }
+        sio.emit('live-message', data, to=sid)
 
 
 @sio.event
