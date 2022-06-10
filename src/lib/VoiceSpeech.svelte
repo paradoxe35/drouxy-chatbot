@@ -1,10 +1,11 @@
 <script lang="ts">
   import { onMount } from "svelte";
+  import { userLiveMessage } from "../../store/messages";
   import {
     animatedCanvas,
     IAnimatedCanvasConfig,
   } from "../../utils/canvas-curve";
-  import { fade } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
   import RecorderController from "../../utils/recorder-controller";
 
   onMount(() => {
@@ -39,6 +40,13 @@
 </script>
 
 <div class="voice__speech" transition:fade>
+  <div class="live__messages">
+    {#each $userLiveMessage as { text, index } (index)}
+      <div class="message" in:fly={{ y: 100 }} out:fade>
+        {text}
+      </div>
+    {/each}
+  </div>
   <canvas id="canvas" height="400" width="400" />
 </div>
 
@@ -50,16 +58,36 @@
     width: 100%;
     height: 100%;
     z-index: 5;
-    background: rgba(0, 0, 0, 0.158);
+    background: rgba(0, 0, 0, 0.556);
     display: flex;
-    justify-content: center;
-    align-items: flex-end;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
   }
   #canvas {
     width: 50%;
     height: auto;
     @media (max-width: 768px) {
       width: 70%;
+    }
+  }
+
+  .live__messages {
+    flex: 1;
+    margin-bottom: -40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    .message {
+      font-size: 3rem;
+      font-family: "Roboto", sans-serif;
+      font-weight: 100;
+      color: #858585;
+      margin-bottom: 1rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
     }
   }
 </style>

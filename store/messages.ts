@@ -32,3 +32,28 @@ function createMessageStore() {
 }
 
 export const messages = createMessageStore();
+
+// Create user live message store
+function createUserLiveMessagesStore() {
+  const { subscribe, update, set } = writable<
+    { text: string; index: number }[]
+  >([]);
+  const limit = 2;
+  let index = 0;
+
+  return {
+    subscribe,
+    addMessage: (message: string) => {
+      update((messages) => {
+        const msg = { text: message, index: index++ };
+        if (messages.length >= limit) {
+          return [...messages, msg].slice(1, limit + 1);
+        }
+        return [...messages, msg];
+      });
+    },
+    reset: () => set([]),
+  };
+}
+
+export const userLiveMessage = createUserLiveMessagesStore();

@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { messages } from "../../store/messages";
-  import { voiceController } from "../../store/store";
+  import { messages, userLiveMessage } from "../../store/messages";
+  import { speechMode } from "../../store/store";
   import { fade } from "svelte/transition";
   import RecorderController from "../../utils/recorder-controller";
 
@@ -13,14 +13,11 @@
   function sendMessage() {
     if (!hasTextValue) return;
     let messageText = textInput;
+    textInput = "";
     messages.addMessage({
       text: messageText,
       from_user: true,
     });
-    textInput = "";
-    window.setTimeout(() => {
-      messages.addMessage({ text: messageText.split("").reverse().join("") });
-    }, 2000);
   }
 
   function handleMicClick(status: boolean) {
@@ -53,7 +50,28 @@
    * notify store about voice controller request
    */
   $: {
-    voiceController.activate(holdMic);
+    speechMode.activate(holdMic);
+  }
+
+  // Mock user live messages
+  $: if (holdMic) {
+    setTimeout(() => {
+      userLiveMessage.addMessage("Hello");
+    }, 1000);
+
+    setTimeout(() => {
+      userLiveMessage.addMessage("I am denis");
+    }, 1500);
+
+    setTimeout(() => {
+      userLiveMessage.addMessage("How are you ?");
+    }, 2000);
+
+    setTimeout(() => {
+      userLiveMessage.addMessage("Love you ?");
+    }, 2500);
+  } else {
+    userLiveMessage.reset();
   }
 </script>
 

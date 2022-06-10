@@ -1,8 +1,8 @@
 import { writable } from "svelte/store";
 
-// create voice controller store
-function createVoiceController() {
-  const { subscribe, set } = writable<boolean>(false);
+// create in speech mode store
+function createSpeechModeStore() {
+  const { subscribe, set } = writable(false);
 
   return {
     subscribe,
@@ -10,7 +10,7 @@ function createVoiceController() {
   };
 }
 
-export const voiceController = createVoiceController();
+export const speechMode = createSpeechModeStore();
 
 // Create is typing store
 function createIsBotTypingStore() {

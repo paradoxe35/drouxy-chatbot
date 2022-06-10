@@ -115,8 +115,9 @@ export default class RecorderController {
     this._onSequentialize = callback;
   }
 
-  static exportSequentializerBlobs() {
-    if (!this._onSequentialize) return null;
+  static async exportSequentializerBlobs() {
+    if (!this._onSequentialize || this.sequentializeBlobs.length === 0)
+      return null;
     return new Promise<Blob>((resolve) => {
       concatenateBlobs(this.sequentializeBlobs, EXPORT_MIME_TYPE, resolve);
     });
