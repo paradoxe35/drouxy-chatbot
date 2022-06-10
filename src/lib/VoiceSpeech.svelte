@@ -76,8 +76,9 @@
     flex-direction: column;
     justify-content: flex-end;
     align-items: center;
+    width: 100%;
     .message {
-      font-size: 3rem;
+      font-size: 2.5rem;
       font-family: "Roboto", sans-serif;
       font-weight: 100;
       color: #858585;
@@ -85,6 +86,10 @@
       text-overflow: ellipsis;
       white-space: nowrap;
       overflow: hidden;
+      width: 100%;
+      text-align: center;
+      padding-left: 1rem;
+      padding-right: 1rem;
     }
   }
 </style>

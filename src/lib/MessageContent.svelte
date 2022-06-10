@@ -2,21 +2,7 @@
   import { isBotTyping } from "../store/store";
   import { messages } from "../store/messages";
   import { swimrotate } from "../utils/animations/transitions";
-  import { onMount } from "svelte";
   import { fade } from "svelte/transition";
-
-  onMount(() => {
-    window.setTimeout(() => {
-      isBotTyping.activate(true);
-    }, 1000);
-
-    window.setTimeout(() => {
-      isBotTyping.activate(false);
-      messages.addMessage({
-        text: "How can I help you?",
-      });
-    }, 5000);
-  });
 </script>
 
 <div class="message__content">
