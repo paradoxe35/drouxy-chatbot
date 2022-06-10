@@ -4,16 +4,16 @@ import asyncio
 import websockets
 import sys
 import wave
-from packages.server.env import get_env
+import env
 
 en_websocket = None
-en_url = 'ws://%d' % get_env('STT_EN_SERVER_PORT')
+en_url = 'ws://%s' % env.get_env('STT_EN_SERVER_PORT')
 if en_url:
     en_websocket = websockets.connect(en_url)
 
 
 fr_websocket = None
-fr_url = 'ws://%d' % get_env('STT_FR_SERVER_PORT')
+fr_url = 'ws://%s' % env.get_env('STT_FR_SERVER_PORT')
 if fr_url:
     fr_websocket = websockets.connect(fr_url)
 
@@ -35,4 +35,4 @@ async def run_test(uri):
     await fr_websocket.send('{"eof" : 1}')
     print(await fr_websocket.recv())
 
-asyncio.run(run_test)
+# asyncio.run(run_test)

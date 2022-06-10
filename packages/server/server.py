@@ -1,7 +1,7 @@
+
 import eventlet
 import socketio
-from .env import get_env
-
+import env
 
 sio = socketio.Server(async_mode='eventlet')
 app = socketio.WSGIApp(sio, static_files=None)
@@ -24,6 +24,6 @@ def disconnect(sid):
 
 # run app
 if __name__ == '__main__':
-    port = get_env('SERVER_PORT')
+    port = int(env.get_env('SERVER_PORT'))
     eventlet.wsgi.server(eventlet.listen(('', port)), app)
     print('Server started on port {}'.format(port))

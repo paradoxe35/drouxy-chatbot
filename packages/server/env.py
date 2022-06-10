@@ -5,4 +5,4 @@ load_dotenv()
 
 
 def get_env(name: str, default=None):
-    return int(os.environ.get(name, default))
+    return os.environ.get(name, default)
