@@ -4,11 +4,13 @@ export const audio_options = {
 
 export const EXPORT_MIME_TYPE = "audio/wav";
 
+export const AUDIO_NUM_CHANNELS = 1;
+
 export const mediaStreamConstraints: MediaStreamConstraints = {
   audio: {
     echoCancellation: true,
     noiseSuppression: true,
-    channelCount: 1,
+    channelCount: AUDIO_NUM_CHANNELS,
     sampleRate: audio_options.sampleRate,
   },
   video: false,
@@ -16,7 +18,7 @@ export const mediaStreamConstraints: MediaStreamConstraints = {
 
 export const defaultMicrophoneConfig = {
   bufferLen: 4096,
-  numChannels: 1,
+  numChannels: AUDIO_NUM_CHANNELS,
   mimeType: EXPORT_MIME_TYPE,
 };
 

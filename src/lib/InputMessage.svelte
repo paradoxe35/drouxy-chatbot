@@ -3,6 +3,11 @@
   import { speechMode } from "../store/store";
   import { fade } from "svelte/transition";
   import RecorderController from "../utils/recorder-controller";
+  import socket from "../network/socket";
+  import {
+    AUDIO_NUM_CHANNELS,
+    EXPORT_MIME_TYPE,
+  } from "../utils/recorder/constants";
 
   let holdMic = false;
   let textInput = "";
@@ -38,8 +43,15 @@
   /**
    * When user stop recording, send the audio blob to the server
    */
-  r_controller.onRecorded((blob) => {
-    console.log("onRecorded", blob);
+  r_controller.onRecorded((result) => {
+    console.log("onRecorded", result.blob);
+
+    socket.sendBlob({
+      sampleRate: result.sampleRate,
+      blob: result.blob,
+      mimeType: EXPORT_MIME_TYPE,
+      numChannels: AUDIO_NUM_CHANNELS,
+    });
   });
 
   r_controller.onSequentialize(({ blob }) => {

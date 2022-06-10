@@ -22,7 +22,9 @@ export default class RecorderController {
 
   private static started_recording_time: number;
 
-  private static onRecordedCallbacks: Array<(blob: Blob) => void> = [];
+  private static onRecordedCallbacks: Array<
+    (data: IRecorder.RecorderResult) => void
+  > = [];
 
   private static _onAnalysed: IOnAnalysed;
 
@@ -35,7 +37,7 @@ export default class RecorderController {
 
   private static canSequentialize: boolean = false;
 
-  private static sequentializeBlobs: Blob[] = [];
+  private static sequentializeBlobs: IRecorder.RecorderResult[] = [];
 
   /**
    * This must be called before any other method and only once.
@@ -98,7 +100,7 @@ export default class RecorderController {
     };
   }
 
-  static onRecorded(callback: (blob: Blob) => void) {
+  static onRecorded(callback: (blob: IRecorder.RecorderResult) => void) {
     this.onRecordedCallbacks.push(callback);
   }
 
@@ -118,8 +120,16 @@ export default class RecorderController {
   static async exportSequentializerBlobs() {
     if (!this._onSequentialize || this.sequentializeBlobs.length === 0)
       return null;
-    return new Promise<Blob>((resolve) => {
-      concatenateBlobs(this.sequentializeBlobs, EXPORT_MIME_TYPE, resolve);
+    return new Promise<IRecorder.RecorderResult>((resolve) => {
+      concatenateBlobs(
+        this.sequentializeBlobs.map(({ blob }) => blob),
+        EXPORT_MIME_TYPE,
+        (blob) => ({
+          blob,
+          mimeType: EXPORT_MIME_TYPE,
+          sampleRate: this.sequentializeBlobs[0].sampleRate,
+        })
+      );
     });
   }
 
@@ -152,7 +162,7 @@ export default class RecorderController {
         triggered = true;
         if (this._onSequentialize) {
           const audioData = await this.recorder.export();
-          this.sequentializeBlobs.push(audioData.blob);
+          this.sequentializeBlobs.push(audioData);
           // clear all buffer
           this.recorder.audioRecorder.clear();
           this._onSequentialize(audioData);
@@ -198,7 +208,7 @@ export default class RecorderController {
 
     // call the callbacks
     this.onRecordedCallbacks.forEach((callback) => {
-      callback(blobSequentializer || recordResult.blob);
+      callback(blobSequentializer || recordResult);
     });
   }
 

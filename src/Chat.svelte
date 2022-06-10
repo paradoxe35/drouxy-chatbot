@@ -1,4 +1,5 @@
 <script lang="ts">
+  import "./network/socket";
   import { speechMode } from "./store/store";
   import InputMessage from "./lib/InputMessage.svelte";
   import MessageContent from "./lib/MessageContent.svelte";
