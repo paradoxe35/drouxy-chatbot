@@ -42,7 +42,7 @@
 <div class="voice__speech" transition:fade>
   <div class="live__messages">
     {#each $userLiveMessage as { text, index } (index)}
-      <div class="message" in:fly={{ y: 100 }} out:fade>
+      <div class="message" in:fly={{ y: 50 }} out:fade>
         {text}
       </div>
     {/each}
