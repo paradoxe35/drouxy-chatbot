@@ -1,20 +1,12 @@
 #!/usr/bin/env python3
 
 import asyncio
-from unittest import result
 import websockets
-import sys
 import wave
 import env
 
-en_websocket = None
 en_url = 'ws://%s' % env.get_env('STT_EN_SERVER_PORT')
-
-
-# fr_websocket = None
-# fr_url = 'ws://%s' % env.get_env('STT_FR_SERVER_PORT')
-# if fr_url:
-#     fr_websocket = websockets.connect(fr_url)
+fr_url = 'ws://%s' % env.get_env('STT_FR_SERVER_PORT')
 
 
 async def run_stt(uri: str, filePath: str):
@@ -39,4 +31,11 @@ def stt_en(wavFile: str):
     if not en_url:
         raise Exception('No STT url server configured')
     result, last_partial = asyncio.run(run_stt(en_url, wavFile))
+    return result, last_partial
+
+
+def stt_fr(wavFile: str):
+    if not fr_url:
+        raise Exception('No STT url server configured')
+    result, last_partial = asyncio.run(run_stt(fr_url, wavFile))
     return result, last_partial

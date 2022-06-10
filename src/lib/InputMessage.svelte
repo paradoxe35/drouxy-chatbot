@@ -123,7 +123,7 @@
 
   /** Close speechMode when pendingSequenceMessageCounter is 0 and holdMic is false */
   $: if ($pendingSequenceMessageCounter === 0 && !holdMic && hasRecorded) {
-    const wait_time = 500;
+    const wait_time = 1000;
     hasRecorded = false;
     setTimeout(() => speechMode.activate(false), wait_time);
 
