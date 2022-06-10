@@ -1,3 +1,4 @@
+.PHONY: stt-server-docker tts-server-docker
 SHELL := /bin/bash
 
 
@@ -7,6 +8,14 @@ make:
 install:
 	@pnpm install
 	poetry install --no-dev
+	make tts-server-docker
+	make stt-server-docker
+
+install-dev:
+	@pnpm install
+	poetry install
+	make tts-server-docker
+	make stt-server-docker
 
 server:
 	@poetry run python packages/server/server.py
