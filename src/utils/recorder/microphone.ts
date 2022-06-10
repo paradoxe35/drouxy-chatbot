@@ -1,4 +1,4 @@
-import InlineWorker from "../../utils/inline-worker";
+import InlineWorker from "../inline-worker";
 import { defaultMicrophoneConfig, EXPORT_MIME_TYPE } from "./constants";
 
 class Microphone {

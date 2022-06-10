@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { messages, userLiveMessage } from "../../store/messages";
-  import { speechMode } from "../../store/store";
+  import { messages, userLiveMessage } from "../store/messages";
+  import { speechMode } from "../store/store";
   import { fade } from "svelte/transition";
-  import RecorderController from "../../utils/recorder-controller";
+  import RecorderController from "../utils/recorder-controller";
 
   let holdMic = false;
   let textInput = "";
