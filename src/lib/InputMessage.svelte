@@ -28,8 +28,8 @@
       const can_record = await r_controller.getUserMedia();
       if (!can_record) return;
 
-      if (status) await r_controller.startRecording();
-      else await r_controller.stopRecording();
+      if (status) r_controller.startRecording();
+      else r_controller.stopRecording();
 
       holdMic = status;
     };
