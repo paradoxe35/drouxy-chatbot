@@ -20,9 +20,6 @@ export default class RecorderController {
 
   private static mediaStream: MediaStream;
 
-  // @ts-ignore
-  private static started_recording_time: number;
-
   private static onRecordingEndCallbacks: Array<
     (data: IRecorder.RecorderResult) => void
   > = [];
@@ -36,7 +33,7 @@ export default class RecorderController {
     data: Uint8Array;
   };
 
-  private static _onSequentialize: sequentializeCallback;
+  private static _onSequentializeCallback: sequentializeCallback[];
 
   private static canSequentialize: boolean = false;
 
@@ -119,18 +116,31 @@ export default class RecorderController {
     this._onAnalysed = handler;
   }
 
+  private static _updateAnalysers(datas: IAnalysed) {
+    if (this._onAnalysed && this.recorder.audioRecorder?.recording) {
+      this._onAnalysed(datas);
+    }
+  }
+
   /**
    * Callback called only when a noise is detected,
    * NB: After the recording is stopped
    * the onRecordingEnd callback is called with the concatenated blobs from the sequentializer
    */
   static onSequentialize(callback: sequentializeCallback) {
-    this._onSequentialize = callback;
+    this._onSequentializeCallback.push(callback);
   }
 
+  /**
+   * Concatenate all the chuncks blobs from the sequentializer and export it
+   */
   static async exportSequentializerBlobs() {
-    if (!this._onSequentialize || this.sequentializeBlobs.length === 0)
+    if (
+      !this._onSequentializeCallback.length ||
+      this.sequentializeBlobs.length === 0
+    ) {
       return null;
+    }
     return new Promise<IRecorder.RecorderResult>((resolve) => {
       concatenateBlobs(
         this.sequentializeBlobs.map(({ blob }) => blob),
@@ -145,6 +155,9 @@ export default class RecorderController {
     });
   }
 
+  /**
+   * start sequentializer loop
+   */
   static async startSequentializer() {
     const { analyser } = this.sequentializerAnalyser!;
     const data = new Uint8Array(analyser.frequencyBinCount);
@@ -173,7 +186,7 @@ export default class RecorderController {
       ) {
         // no noise detected
         triggered = true;
-        if (this._onSequentialize) {
+        if (this._onSequentializeCallback.length > 0) {
           // eanable pending the exportation
           this.sequentializerStatus.enableInPending();
 
@@ -181,25 +194,30 @@ export default class RecorderController {
           this.sequentializeBlobs.push(audioData);
           // disable pending the exportation
           this.sequentializerStatus.disableInPending();
-          // clear all buffer
+          // clear all buffer from the recorder
           this.recorder.audioRecorder.clear();
-          this._onSequentialize(audioData);
+
+          this._onSequentializeCallback.forEach((callback) =>
+            callback(audioData)
+          );
         }
       }
     };
     requestAnimationFrame(loop);
   }
 
+  /**
+   * Stop the sequentializer loop
+   */
   static async stopSequentializer() {
     this.canSequentialize = false;
   }
 
-  private static _updateAnalysers(datas: IAnalysed) {
-    if (this._onAnalysed && this.recorder.audioRecorder?.recording) {
-      this._onAnalysed(datas);
-    }
-  }
-
+  /**
+   * Start the recording
+   *
+   * @returns
+   */
   static async startRecording() {
     await this.audioContext.resume();
     // set the analyser callback and start the Analysers auto update
@@ -209,11 +227,15 @@ export default class RecorderController {
     this.startSequentializer();
     // start the recorder
     await this.recorder.start();
-    this.started_recording_time = Date.now();
 
     this.onRecordingStartCallbacks.forEach((callback) => callback());
   }
 
+  /**
+   * Stop the recording
+   *
+   * @returns
+   */
   static async stopRecording() {
     // make some clean up
     this.recorder.setOnAnalysed(null);
@@ -224,11 +246,8 @@ export default class RecorderController {
     const blobSequentializer = await this.exportSequentializerBlobs();
     this.stopSequentializer();
 
-    console.log(blobSequentializer);
-
     // stop the recorder
     const recordResult = await this.recorder.stop();
-    this.started_recording_time = 0;
 
     // call the callbacks
     this.onRecordingEndCallbacks.forEach((callback) => {

@@ -32,6 +32,9 @@
     });
   }
 
+  /**
+   * This will trigger the start or stop of recording regarding of the status of {holdMic}
+   */
   function handleMicClick(status: boolean) {
     /**
      * Start recording or stop recording
@@ -47,7 +50,7 @@
     };
   }
 
-  /** handle sequential recording */
+  /** Handle sequential recording */
   function handleSequentialRecording(result: IRecorder.RecorderResult) {
     console.log("handleSequentialRecording", result.blob);
     hasRecorded = true;
@@ -65,11 +68,11 @@
 
   /* When user stop recording, send the audio blob to the server */
   function handleEndRecording(result: IRecorder.RecorderResult) {
-    /**
-     * IF there is message from sequential recording,
-     * and no last sequency which was not captured by onSequentialize listener
-     */
     if ($pendingSequenceMessageCounter !== 0 && !result.lastSequence) {
+      /**
+       * IF there is message from sequential recording,
+       * and no last sequency which was not captured by onSequentialize listener
+       */
       return;
     } else if (result.lastSequence) {
       result.blob = result.lastSequence;
@@ -98,16 +101,14 @@
     pendingSequenceMessageCounter.decrement();
   });
 
-  /**
-   * notify store about voice controller request
-   */
+  /** Notify store about voice controller request */
   $: if (holdMic) {
     speechMode.activate(true);
   }
 
-  // Close speechMode when pendingSequenceMessageCounter is 0 and holdMic is false
+  /** Close speechMode when pendingSequenceMessageCounter is 0 and holdMic is false */
   $: if ($pendingSequenceMessageCounter === 0 && !holdMic && hasRecorded) {
-    const wait_time = 1000;
+    const wait_time = 500;
     hasRecorded = false;
     setTimeout(() => speechMode.activate(false), wait_time);
 
