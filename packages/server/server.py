@@ -3,7 +3,8 @@ import eventlet
 import socketio
 import env
 import wave
-from stt.client import stt_en
+from stt.client import stt_en, stt_fr
+from tts.client import tts_en, tts_fr
 import tempfile
 
 
@@ -54,4 +55,3 @@ def disconnect(sid):
 if __name__ == '__main__':
     port = int(env.get_env('SERVER_PORT'))
     eventlet.wsgi.server(eventlet.listen(('', port)), app)
-    print('Server started on port {}'.format(port))

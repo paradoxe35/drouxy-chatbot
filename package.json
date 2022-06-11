@@ -22,6 +22,8 @@
     "vite": "^2.9.9"
   },
   "dependencies": {
+    "extendable-media-recorder": "^6.6.7",
+    "extendable-media-recorder-wav-encoder": "^7.0.73",
     "socket.io-client": "^4.5.1"
   }
 }

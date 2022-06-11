@@ -5,12 +5,12 @@ class Microphone {
   config: any;
   recording: boolean;
   callbacks: { getBuffer: any[]; exportWAV: any[] };
-  context: AudioContext & { createJavaScriptNode?: any };
-  node: any;
+  context: BaseAudioContext & { createJavaScriptNode?: any };
+  node: ScriptProcessorNode;
   worker: any;
   static forceDownload: (blob: any, filename: any) => void;
 
-  constructor(source, config?: any) {
+  constructor(source: GainNode, config?: any) {
     this.config = Object.assign({}, defaultMicrophoneConfig, config);
 
     this.recording = false;
@@ -33,7 +33,7 @@ class Microphone {
     this.node.onaudioprocess = (e) => {
       if (!this.recording) return;
 
-      var buffer: any[] = [];
+      const buffer: any[] = [];
       for (var channel = 0; channel < this.config.numChannels; channel++) {
         buffer.push(e.inputBuffer.getChannelData(channel));
       }
