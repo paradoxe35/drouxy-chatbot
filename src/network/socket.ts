@@ -8,7 +8,7 @@ export const socketIO = io(SERVER_URL, {
 });
 
 function sendSpeechRecorded(data: IRecordedDto) {
-  socketIO.emit("recording", data);
+  socketIO.emit("user_message_stt", data);
 }
 
 function liveMessageEvent(cb: (data: ILiveMessage) => void) {

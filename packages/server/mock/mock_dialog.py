@@ -1,16 +1,25 @@
+from email.policy import default
 import os
 import json
 import asyncio
 import jellyfish
 import random
+import emoji
 
+dialog_data = {
+    "fr": None,
+    "en": None
+}
 
-dialog_data: dict = None
-dialog_file = '%s/mock/dialogs.json' % os.getcwd()
+dialog_files = {
+    "fr": "%s/mock/dialogs_fr.json" % os.getcwd(),
+    "en": "%s/mock/dialogs_en.json" % os.getcwd()
+}
+
 jaro_distance_limit = 0.3
 
-entities = {
-    "author": "Drouxy",
+default_message_entities = {
+    "author": "Paradoxe",
     "language": "undefined",
     "botName": "Drouxy",
     "name": "User Name",
@@ -22,22 +31,22 @@ def dictKeys(dict_data: dict):
     return list(dict_data.keys())
 
 
-def read_json() -> dict:
+def read_json(language: str) -> dict:
     global dialog_data
     """
         Reads the dialog data from the json file.
     """
-    if dialog_data != None:
-        return dialog_data
-    with open(dialog_file) as json_file:
+    if dialog_data[language] != None:
+        return dialog_data[language]
+    with open(dialog_files[language]) as json_file:
         data = json.load(json_file)
-        dialog_data = data
+        dialog_data[language] = data
 
-    return dialog_data
+    return dialog_data[language]
 
 
-def text_occorrences(text: str):
-    json_data = read_json()
+def text_occurrences(text: str, language: str):
+    json_data = read_json(language)
     fallbacks: list = json_data['fallbacks']
     intents: dict = json_data['intents']
 
@@ -66,20 +75,32 @@ def text_occorrences(text: str):
         return None, None, fallbacks
 
 
-def generate_response(text: str):
-    intent, probability, responses = text_occorrences(text)
+def generate_response(text: str, language: str) -> str:
+    intent, probability, responses = text_occurrences(text, language)
     try:
-        return random.choice(responses)
+        return random.choice(responses), intent, probability,
     except:
-        return '😔'
+        return '😔', intent, probability
 
 
-async def bulck_dialog(message: str):
+async def bulck_dialog(message: str, message_entities: dict):
     loop = asyncio.get_event_loop()
-    future = loop.run_in_executor(None, generate_response, message)
-    return await future
+    language = 'fr' if message_entities['language'] == 'fr' else 'en'
+    future_message = await loop.run_in_executor(None, generate_response, message, language)
+    is_emoji = False
+    if len(future_message) <= 2:
+        is_emoji = bool(emoji.get_emoji_regexp().search(future_message))
+
+    # Replace entities with message_entities
+    message_entities = {
+        **default_message_entities,
+        **message_entities
+    }
+    for key, value in message_entities.items():
+        future_message = future_message.replace(f'${key}', value)
+    return future_message, is_emoji
 
 
-def mock_dialog(message: str):
-    data = asyncio.run(bulck_dialog(message))
-    return data
+def mock_dialog(message: str, message_entities: dict):
+    response, is_emoji = asyncio.run(bulck_dialog(message, message_entities))
+    return response, is_emoji
