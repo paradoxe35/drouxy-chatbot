@@ -16,9 +16,11 @@ wit = "^6.0.1"
 aiohttp = "^3.8.1"
 aiofiles = "^0.8.0"
 unsync = "^1.4.0"
+emoji = "^1.7.0"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.6.0"
+jellyfish = "^0.9.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

@@ -6,6 +6,8 @@ import wave
 from stt.client import stt_en, stt_fr
 from tts.client import tts_en, tts_fr
 import tempfile
+# mock_dialog
+from mock.mock_dialog import mock_dialog
 
 
 # get allowed origins from env.py and parse it to a list
