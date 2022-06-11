@@ -1,9 +1,9 @@
 <script lang="ts">
   import socket from "./network/socket";
   import { speechMode } from "./store/store";
-  import InputMessage from "./chat/InputMessage.sveltee";
-  import MessageContent from "./chat/MessageContent.sveltee";
-  import VoiceSpeech from "./chat/VoiceSpeech.sveltee";
+  import InputMessage from "./Chat/InputMessage.sveltee";
+  import MessageContent from "./Chat/MessageContent.sveltee";
+  import VoiceSpeech from "./Chat/VoiceSpeech.sveltee";
   import RecorderController from "./utils/recorder-controller";
   import { onMount } from "svelte";
   import {
