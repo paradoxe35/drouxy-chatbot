@@ -6,22 +6,8 @@ export type Message = {
   text?: string;
 };
 
-const defaultMessages = [
-  {
-    text: "Hey 👋 I am Elwa. Before we start, tell me your name.",
-  },
-  {
-    from_user: true,
-    text: "Hello, I am Denis.",
-  },
-  {
-    from_user: false,
-    text: "Hello 👋, I am Elwa. Before we start, tell me your name.",
-  },
-];
-
 function createMessageStore() {
-  const { subscribe, update } = writable<Message[]>(defaultMessages);
+  const { subscribe, update } = writable<Message[]>([]);
 
   return {
     subscribe,

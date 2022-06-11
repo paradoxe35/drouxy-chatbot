@@ -4,7 +4,7 @@
     pendingSequenceMessageCounter,
     userLiveMessage,
   } from "../store/messages";
-  import { isBotTyping, speechMode } from "../store/store";
+  import { speechMode } from "../store/store";
   import { fade } from "svelte/transition";
   import RecorderController from "../utils/recorder-controller";
   import socket from "../network/socket";
@@ -14,7 +14,6 @@
   } from "../utils/recorder/constants";
   import { debounce } from "../utils/debounce";
   import type IRecorder from "src/utils/recorder/index.d";
-  import { onMount } from "svelte";
 
   let holdMic = false;
   let textInput = "";
@@ -22,19 +21,6 @@
   const r_controller = RecorderController;
 
   // Mock start message from bot
-  onMount(() => {
-    window.setTimeout(() => {
-      isBotTyping.activate(true);
-    }, 1000);
-
-    window.setTimeout(() => {
-      isBotTyping.activate(false);
-      messages.addMessage({
-        text: "How can I help you?",
-      });
-    }, 5000);
-  });
-
   $: hasTextValue = textInput.trim().length > 0;
 
   function sendMessage() {
