@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { isBotTyping } from "../store/store";
-  import { messages } from "../store/messages";
-  import { swimrotate } from "../utils/animations/transitions";
+  import { isBotTyping } from "@src/store/store";
+  import { messages } from "@src/store/messages";
+  import { swimrotate } from "@src/utils/animations/transitions";
   import { fade } from "svelte/transition";
 </script>
 

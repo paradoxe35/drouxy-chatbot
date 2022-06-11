@@ -1,9 +1,12 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { userLiveMessage } from "../store/messages";
-  import { animatedCanvas, IAnimatedCanvasConfig } from "../utils/canvas-curve";
+  import { userLiveMessage } from "@src/store/messages";
+  import {
+    animatedCanvas,
+    IAnimatedCanvasConfig,
+  } from "@src/utils/canvas-curve";
   import { fade, fly } from "svelte/transition";
-  import RecorderController from "../utils/recorder-controller";
+  import RecorderController from "@src/utils/recorder-controller";
 
   onMount(() => {
     const MAX_rgB_VALUE = 150;

@@ -3,16 +3,16 @@
     messages,
     pendingSequenceMessageCounter,
     userLiveMessage,
-  } from "../store/messages";
-  import { speechMode } from "../store/store";
+  } from "@src/store/messages";
+  import { speechMode } from "@src/store/store";
   import { fade } from "svelte/transition";
-  import RecorderController from "../utils/recorder-controller";
-  import socket from "../network/socket";
+  import RecorderController from "@src/utils/recorder-controller";
+  import socket from "@src/network/socket";
   import {
     AUDIO_NUM_CHANNELS,
     EXPORT_MIME_TYPE,
-  } from "../utils/recorder/constants";
-  import { debounce } from "../utils/debounce";
+  } from "@src/utils/recorder/constants";
+  import { debounce } from "@src/utils/debounce";
   import type IRecorder from "src/utils/recorder/index.d";
 
   let holdMic = false;

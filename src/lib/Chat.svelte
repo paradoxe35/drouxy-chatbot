@@ -1,15 +1,15 @@
 <script lang="ts">
-  import socket from "./network/socket";
-  import { speechMode } from "./store/store";
+  import socket from "@src/network/socket";
+  import { speechMode } from "@src/store/store";
   import InputMessage from "./Chat/InputMessage.svelte";
   import MessageContent from "./Chat/MessageContent.svelte";
   import VoiceSpeech from "./Chat/VoiceSpeech.svelte";
-  import RecorderController from "./utils/recorder-controller";
+  import RecorderController from "@src/utils/recorder-controller";
   import { onMount } from "svelte";
   import {
     pendingSequenceMessageCounter,
     userLiveMessage,
-  } from "./store/messages";
+  } from "@src/store/messages";
 
   onMount(() => {
     /**

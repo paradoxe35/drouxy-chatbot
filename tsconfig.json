@@ -16,10 +16,16 @@
     "checkJs": true,
     "strict": true,
     "noUnusedLocals": true,
+    "allowSyntheticDefaultImports": true,
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noImplicitAny": false,
     "removeComments": true,
+    "paths": {
+      "@src/*": [
+        "src/*"
+      ]
+    }
   },
   "include": [
     "src/**/*.d.ts",
