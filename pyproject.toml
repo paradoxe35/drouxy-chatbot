@@ -17,6 +17,7 @@ aiohttp = "^3.8.1"
 aiofiles = "^0.8.0"
 unsync = "^1.4.0"
 emoji = "^1.7.0"
+uuid = "^1.30"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.6.0"
