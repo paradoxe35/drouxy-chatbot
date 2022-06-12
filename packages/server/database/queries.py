@@ -75,7 +75,17 @@ def change_language(user_session: dict, datas: dict):
     if not user:
         return None
     user.language = 'fr' if datas['language'] == 'fr' else 'en'
+    return to_object(user.to_dict())
 
+
+@orm.db_session
+def tts_enabled(user_session: dict, datas: dict):
+    if not required_keys(datas, ['tts_enabled']):
+        return False
+    user = User.get(session_id=user_session['session_id'])
+    if not user:
+        return None
+    user.tts_enabled = bool(datas['tts_enabled'])
     return to_object(user.to_dict())
 
 

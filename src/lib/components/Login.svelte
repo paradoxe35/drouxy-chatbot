@@ -35,7 +35,10 @@
   $: username,
     language,
     (() => {
-      if (username.trim().length > 1 && ["en", "fr"].includes(language)) {
+      if (
+        username.trim().length > 1 &&
+        client_socket.languagesValue().includes(language)
+      ) {
         valide_form = true;
       } else {
         valide_form = false;
@@ -71,8 +74,9 @@
     <p>Select one of the supported languages</p>
     <div class="input__text input">
       <select bind:value={language}>
-        <option value="en">English</option>
-        <option value="fr">French</option>
+        {#each client_socket.languages as lang}
+          <option value={lang.value}>{lang.name}</option>
+        {/each}
       </select>
     </div>
 

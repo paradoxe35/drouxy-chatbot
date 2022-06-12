@@ -108,6 +108,17 @@ def change_language(sid, data):
         sio.emit('authenticated', new_user, to=sid)
 
 
+@sio.on('tts_enabled')
+def tts_enabled(sid, data):
+    with sio.session(sid) as session:
+        if 'user_session' not in session:
+            return False
+        new_user = queries.tts_enabled(session['user_session'], data)
+        if new_user:
+            session['user_session'] = new_user
+        sio.emit('authenticated', new_user, to=sid)
+
+
 @sio.on('user_message')
 def user_message(sid, data):
     with sio.session(sid) as session:

@@ -6,6 +6,8 @@
   import RecorderController from "@src/utils/recorder-controller";
   import { onMount } from "svelte";
   import { client_socket } from "@src/network/client";
+  import UserDetail from "./Chat/UserDetail.svelte";
+  import { authenticatedUser } from "@src/store/authentication";
 
   onMount(() => {
     /**
@@ -24,6 +26,10 @@
     <VoiceSpeech />
   {/if}
 </div>
+
+{#if $authenticatedUser}
+  <UserDetail />
+{/if}
 
 <style lang="scss">
   .chat__wrapper {

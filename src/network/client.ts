@@ -23,6 +23,11 @@ class Client {
   private authenticatedUser: IAuthenticatedUser | null = null;
   public has_initial_messages: boolean = false;
 
+  public languages: { value: string; name: string }[] = [
+    { value: "en", name: "English" },
+    { value: "fr", name: "Français" },
+  ];
+
   private readonly stores = {
     userLiveMessage,
     pendingSequenceMessageCounter,
@@ -106,6 +111,10 @@ class Client {
     this.socket.open();
   }
 
+  public languagesValue(): string[] {
+    return this.languages.map((l) => l.value);
+  }
+
   private unauthenticate() {
     this.authenticatedUser = null;
     this.stores.authenticatedUser.logout();
@@ -165,9 +174,23 @@ class Client {
     this.socket.emit("user_recording_stt", data);
   }
 
+  public $emit_tts_enabled(tts_enabled: boolean) {
+    this.require_authentication();
+
+    if (this.authenticatedUser?.tts_enabled !== tts_enabled) {
+      this.socket.emit("tts_enabled", { tts_enabled: +tts_enabled });
+    }
+  }
+
   public $emit_change_language(language: string) {
     this.require_authentication();
-    this.socket.emit("change_language", { language });
+
+    if (
+      this.languagesValue().includes(language) &&
+      this.authenticatedUser!.language !== language
+    ) {
+      this.socket.emit("change_language", { language });
+    }
   }
 
   private async $event_bot_response(data: BotResponseEvent) {
