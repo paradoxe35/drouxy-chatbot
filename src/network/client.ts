@@ -120,6 +120,9 @@ class Client {
     this.authenticatedUser = null;
     this.stores.authenticatedUser.logout();
     this.stores.screenMode.setMode("login");
+    this.stores.messages.setMessages([]);
+    this.stores.userLiveMessage.reset();
+    this.stores.pendingSequenceMessageCounter.reset();
     this.remove_authenticated_storage();
   }
 
