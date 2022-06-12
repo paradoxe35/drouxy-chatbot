@@ -28,6 +28,8 @@ class Client {
     { value: "fr", name: "Français" },
   ];
 
+  private sessionStorageKey = "dxr_authenticated";
+
   private readonly stores = {
     userLiveMessage,
     pendingSequenceMessageCounter,
@@ -75,7 +77,6 @@ class Client {
 
     this.socket.on("authentication_failed", () => {
       this.unauthenticate();
-      this.stores.screenMode.setMode("login");
     });
 
     // listen for logout event
@@ -118,6 +119,8 @@ class Client {
   private unauthenticate() {
     this.authenticatedUser = null;
     this.stores.authenticatedUser.logout();
+    this.stores.screenMode.setMode("login");
+    this.remove_authenticated_storage();
   }
 
   private require_authentication() {
@@ -127,7 +130,7 @@ class Client {
   }
 
   private get_authenticated_storage(): IAuthenticatedEvent | null {
-    const authenticated = sessionStorage.getItem("dxr_authenticated");
+    const authenticated = sessionStorage.getItem(this.sessionStorageKey);
     if (authenticated) {
       try {
         return JSON.parse(authenticated);
@@ -138,9 +141,13 @@ class Client {
     return null;
   }
 
+  private remove_authenticated_storage() {
+    sessionStorage.removeItem(this.sessionStorageKey);
+  }
+
   private set_authenticated_storage(data: IAuthenticatedEvent) {
-    sessionStorage.removeItem("dxr_authenticated");
-    return sessionStorage.setItem("dxr_authenticated", JSON.stringify(data));
+    sessionStorage.removeItem(this.sessionStorageKey);
+    return sessionStorage.setItem(this.sessionStorageKey, JSON.stringify(data));
   }
 
   public $emit_login_session(data: IUserSessionEmit) {
