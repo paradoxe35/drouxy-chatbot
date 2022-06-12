@@ -20,7 +20,7 @@
 <div class="default__screen">
   <div class="color__screen" />
   <div class="screen_content">
-    {#if $screenMode !== "loading"}
+    {#if $screenMode === "login"}
       <div class="login" transition:fade>
         <Login />
       </div>
