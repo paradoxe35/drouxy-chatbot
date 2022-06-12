@@ -10,21 +10,24 @@ fr_url = 'ws://%s' % env.get_env('STT_FR_SERVER_PORT')
 
 
 async def run_stt(uri: str, filePath: str):
-    last_partial = None
-    async with websockets.connect(uri) as websocket:
-        wf = wave.open(filePath, "rb")
-        await websocket.send('{ "config" : { "sample_rate" : %d } }' % (wf.getframerate()))
-        buffer_size = int(wf.getframerate() * 0.2)  # 0.2 seconds of audio
-        while True:
-            data = wf.readframes(buffer_size)
-            if len(data) == 0:
-                break
-            await websocket.send(data)
-            last_partial = await websocket.recv()
+    try:
+        last_partial = None
+        async with websockets.connect(uri) as websocket:
+            wf = wave.open(filePath, "rb")
+            await websocket.send('{ "config" : { "sample_rate" : %d } }' % (wf.getframerate()))
+            buffer_size = int(wf.getframerate() * 0.2)  # 0.2 seconds of audio
+            while True:
+                data = wf.readframes(buffer_size)
+                if len(data) == 0:
+                    break
+                await websocket.send(data)
+                last_partial = await websocket.recv()
 
-        await websocket.send('{"eof" : 1}')
-        final = await websocket.recv()
-    return final, last_partial
+            await websocket.send('{"eof" : 1}')
+            final = await websocket.recv()
+        return final, last_partial
+    except Exception as e:
+        return None, None
 
 
 def stt_en(wavFile: str):

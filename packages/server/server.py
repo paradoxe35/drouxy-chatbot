@@ -140,6 +140,8 @@ def user_recording_stt(sid, data):
                     'final': result,
                     'last_partial': last_partial
                 }
+                if not result:
+                    data['error'] = 1
                 # send the stt result to the client
                 sio.emit('stt_live_message', data, to=sid)
 
