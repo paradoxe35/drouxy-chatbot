@@ -84,7 +84,7 @@ def disconnect_session(sid):
         if 'user_session' in session:
             queries.logout_user(session['user_session'])
             del session['user_session']
-            sio.emit('logout', to=sid)
+            sio.emit('logout_session', to=sid)
 
 
 @sio.on('messages')

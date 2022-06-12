@@ -9,6 +9,8 @@
   $: tts_enabled, client_socket.$emit_tts_enabled(tts_enabled);
 
   $: language, client_socket.$emit_change_language(language);
+
+  const handleLogout = () => client_socket.$emit_logout_session();
 </script>
 
 <div class="user__details">
@@ -31,6 +33,10 @@
       {" "}
       <input type="checkbox" name="tts_enabled" bind:checked={tts_enabled} />
     </span>
+  </div>
+
+  <div class="detail">
+    <button on:click={handleLogout}>Logout</button>
   </div>
 </div>
 

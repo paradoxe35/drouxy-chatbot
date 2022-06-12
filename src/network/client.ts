@@ -79,7 +79,7 @@ class Client {
     });
 
     // listen for logout event
-    this.socket.on("logout", () => {
+    this.socket.on("logout_session", () => {
       this.unauthenticate();
     });
 
