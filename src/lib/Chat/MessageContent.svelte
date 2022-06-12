@@ -71,6 +71,9 @@
     -ms-overflow-style: none;
     scrollbar-width: none;
 
+    .message__items:first-child {
+      margin-top: 1rem;
+    }
     .message__items:last-child {
       margin-bottom: 5rem;
     }
