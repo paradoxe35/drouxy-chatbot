@@ -16,7 +16,7 @@ dialog_files = {
     "en": "%s/mock/dialogs_en.json" % os.getcwd()
 }
 
-jaro_distance_limit = 0.3
+jaro_distance_limit = 0.8
 
 default_message_entities = {
     "author": "Paradoxe",
@@ -31,22 +31,22 @@ def dictKeys(dict_data: dict):
     return list(dict_data.keys())
 
 
-def read_json(language: str) -> dict:
+def read_json(user_language: str) -> dict:
     global dialog_data
     """
         Reads the dialog data from the json file.
     """
-    if dialog_data[language] != None:
-        return dialog_data[language]
-    with open(dialog_files[language]) as json_file:
+    if dialog_data[user_language] != None:
+        return dialog_data[user_language]
+    with open(dialog_files[user_language]) as json_file:
         data = json.load(json_file)
-        dialog_data[language] = data
+        dialog_data[user_language] = data
 
-    return dialog_data[language]
+    return dialog_data[user_language]
 
 
-def text_occurrences(text: str, language: str):
-    json_data = read_json(language)
+def text_occurrences(text: str, user_language: str):
+    json_data = read_json(user_language)
     fallbacks: list = json_data['fallbacks']
     intents: dict = json_data['intents']
 
@@ -75,8 +75,8 @@ def text_occurrences(text: str, language: str):
         return None, None, fallbacks
 
 
-def generate_response(text: str, language: str) -> str:
-    intent, probability, responses = text_occurrences(text, language)
+def generate_response(text: str, user_language: str) -> str:
+    intent, probability, responses = text_occurrences(text, user_language)
     try:
         return random.choice(responses), intent, probability,
     except:
@@ -85,8 +85,8 @@ def generate_response(text: str, language: str) -> str:
 
 async def bulck_dialog(message: str, message_entities: dict):
     loop = asyncio.get_event_loop()
-    language = 'fr' if message_entities['language'] == 'fr' else 'en'
-    future_message, intent, probability = await loop.run_in_executor(None, generate_response, message, language)
+    user_language = message_entities['user_language']
+    future_message, intent, probability = await loop.run_in_executor(None, generate_response, message, user_language)
     is_emoji = False
     if len(future_message) <= 2:
         is_emoji = bool(emoji.get_emoji_regexp().search(future_message))

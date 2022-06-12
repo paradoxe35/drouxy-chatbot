@@ -49,6 +49,6 @@ export type IMessage = {
 };
 
 export type BotResponseEvent = {
-  text: string;
+  message: string;
   audio?: BlobPart;
 };

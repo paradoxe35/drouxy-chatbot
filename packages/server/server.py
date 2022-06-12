@@ -19,14 +19,14 @@ sio = socketio.Server(async_mode='eventlet',
 app = socketio.WSGIApp(sio, static_files=None)
 
 
-def bot_response(sid, message: str, user_session: dict, default_message=False):
-    global sio
+def bot_response(sid: str, message: str, user_session: dict, default_message=False):
     """
     Generate a response from the bot.
     """
     user_language = user_session['language']
     message_entities = {
         "language": "Français" if user_language == 'fr' else "English",
+        "user_language": user_language,
         "name": user_session['username'],
         "geo-city": user_session['geo_city'],
     }
@@ -39,6 +39,8 @@ def bot_response(sid, message: str, user_session: dict, default_message=False):
         if audio_byte:
             sio.emit('tts_bot_response', {
                      'audio': audio_byte, "message": response}, to=sid)
+        else:
+            sio.emit('bot_response', {"message": response}, to=sid)
     else:
         sio.emit('bot_response', {'message': response}, to=sid)
 

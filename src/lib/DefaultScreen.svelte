@@ -2,7 +2,6 @@
   import { screenMode } from "@src/store/store";
   import Loader from "./components/Loader.svelte";
   import Login from "./components/Login.svelte";
-  import { fade } from "svelte/transition";
 
   let loading_timeout;
 
@@ -21,13 +20,13 @@
   <div class="color__screen" />
   <div class="screen_content">
     {#if $screenMode !== "loading"}
-      <div class="login" out:fade>
+      <div class="login">
         <Login />
       </div>
     {/if}
 
     {#if $screenMode === "loading"}
-      <div class="loader" in:fade>
+      <div class="loader">
         <Loader />
       </div>
     {/if}

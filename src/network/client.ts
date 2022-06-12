@@ -30,7 +30,9 @@ class Client {
     screenMode,
   };
 
-  constructor(private readonly socket: Socket) {}
+  constructor(private readonly socket: Socket) {
+    this.$event_bot_response = this.$event_bot_response.bind(this);
+  }
 
   /**
    * This must be called once on main chat component mount.
@@ -55,7 +57,9 @@ class Client {
       this.authenticatedUser = data;
       this.stores.authenticatedUser.authenticate(data);
       this.stores.screenMode.setMode("chat");
-      this.set_authenticated_storage(data);
+      if (import.meta.env.VITE_PERSISTE_SESSION === "true") {
+        this.set_authenticated_storage(data);
+      }
     });
 
     this.socket.on("authentication_failed", () => {
@@ -151,9 +155,6 @@ class Client {
 
   private $event_bot_response(data: BotResponseEvent) {
     this.require_authentication();
-
-    console.log(data.audio);
-
     if (data.audio) {
       const blob = new Blob([data.audio], {
         type: "audio/wav",
@@ -172,7 +173,7 @@ class Client {
           this.stores.isBotSpeech.activate(false);
           this.stores.messages.addMessage({
             from_user: false,
-            text: data.text,
+            text: data.message,
           });
         }, 500);
       });
@@ -187,7 +188,7 @@ class Client {
 
     this.stores.messages.addMessage({
       from_user: false,
-      text: data.text,
+      text: data.message,
     });
   }
 }
