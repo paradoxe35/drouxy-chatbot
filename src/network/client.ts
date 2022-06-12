@@ -56,7 +56,13 @@ class Client {
     this.socket.on("authenticated", (data: IAuthenticatedEvent) => {
       this.authenticatedUser = data;
       this.stores.authenticatedUser.authenticate(data);
+      this.stores.screenMode.setMode("chat");
       this.set_authenticated_storage(data);
+    });
+
+    this.socket.on("authentication_failed", () => {
+      this.unauthenticate();
+      this.stores.screenMode.setMode("login");
     });
 
     // listen for logout event

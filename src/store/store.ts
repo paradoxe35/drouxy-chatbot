@@ -13,7 +13,7 @@ function createSpeechModeStore() {
 export const speechMode = createSpeechModeStore();
 
 // Create screen mode store
-type ScreenMode = "loading" | "chat" | "speech";
+type ScreenMode = "loading" | "chat" | "login";
 
 function createScreenModeStore() {
   const { subscribe, set } = writable<ScreenMode>("loading");

@@ -17,7 +17,9 @@
       shadowColor: { rgB: MIN_rgB_VALUE },
     };
 
-    const canvas = document.querySelector("canvas");
+    const canvas = document.querySelector(
+      "#speecher__canvas"
+    ) as HTMLCanvasElement;
     const ctx = canvas!.getContext("2d")!;
     const cancelDrawLoop = animatedCanvas(canvas!, ctx, animatedCanvasConfig);
 
@@ -29,7 +31,7 @@
         const v = (data[i] * 10) / lineTo;
         const add = (v * MAX_rgB_VALUE_DIFF) / 10;
         const new_rgB = MIN_rgB_VALUE + add * AMPLIFIER;
-        animatedCanvasConfig.shadowColor.rgB = new_rgB;
+        animatedCanvasConfig!.shadowColor!.rgB = new_rgB;
       }
     });
 
@@ -47,7 +49,7 @@
       </div>
     {/each}
   </div>
-  <canvas id="canvas" height="400" width="400" />
+  <canvas id="speecher__canvas" height="400" width="400" />
 </div>
 
 <style lang="scss">
@@ -64,7 +66,7 @@
     justify-content: flex-end;
     align-items: center;
   }
-  #canvas {
+  #speecher__canvas {
     width: 50%;
     height: auto;
     @media (max-width: 768px) {

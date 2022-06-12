@@ -104,6 +104,8 @@ def change_language(sid, data):
         if 'user_session' not in session:
             return False
         new_user = queries.change_language(session['user_session'], data)
+        if new_user:
+            session['user_session'] = new_user
         sio.emit('authenticated', new_user, to=sid)
 
 

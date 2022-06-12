@@ -30,7 +30,7 @@ def authenticate_user(sid: str, datas: dict):
     user = User(
         username=datas['username'],
         tts_enabled=bool(datas['tts_enabled']),
-        language=datas['language'],
+        language='fr' if datas['language'] == 'fr' else 'en',
         geo_city=geo_city
     )
 

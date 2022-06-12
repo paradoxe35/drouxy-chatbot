@@ -1,11 +1,15 @@
 export type IAnimatedCanvasConfig = {
-  shadowColor: { rgB: number };
+  shadowColor?: { rgB: number };
+  shadowBlur?: number;
+  strokeRepeat?: number;
+  gradiants?: [[string, string]];
+  globalCompositeOperation?: GlobalCompositeOperation;
 };
 
 export function animatedCanvas(
   canvas: HTMLCanvasElement,
   ctx: CanvasRenderingContext2D,
-  config: IAnimatedCanvasConfig
+  config: IAnimatedCanvasConfig = {}
 ) {
   const animationFrameId: { value: null | number } = { value: null };
   const cancelDrawLoop = { value: false };
@@ -17,14 +21,25 @@ export function animatedCanvas(
   const radius = (canvas.width / 2) * 0.5;
   let phasex = { value: 1.2 };
 
+  const defaultConfig: IAnimatedCanvasConfig = {
+    shadowBlur: 45,
+    strokeRepeat: 6,
+    gradiants: [["#3fa3f6", "#5927f5"]],
+    globalCompositeOperation: "luminosity",
+    ...config,
+  };
+
+  const color1 = defaultConfig.gradiants![0][0];
+  const color2 = defaultConfig.gradiants![0][1];
+
   let shadowColor = () => {
-    let rgB = +config?.shadowColor?.rgB || 97;
+    let rgB = +(config?.shadowColor?.rgB || 0) || 97;
     return `rgba(32, 0, ${rgB}, 0.978)`;
   };
 
   const gradient = ctx.createLinearGradient(0, 0, center.x * 3, center.y * 0.9);
-  gradient.addColorStop(0, "#3fa3f6");
-  gradient.addColorStop(1, "#5927f5");
+  gradient.addColorStop(0, color1);
+  gradient.addColorStop(1, color2);
 
   const gradient2 = ctx.createLinearGradient(
     0,
@@ -32,12 +47,12 @@ export function animatedCanvas(
     center.x * 5,
     center.y * 0.9
   );
-  gradient2.addColorStop(0, "#3fa3f6");
-  gradient2.addColorStop(1, "#5927f5");
+  gradient2.addColorStop(0, color1);
+  gradient2.addColorStop(1, color2);
 
   const gradient3 = ctx.createLinearGradient(0, 0, center.x, center.y);
-  gradient3.addColorStop(0, "#3fa3f6");
-  gradient3.addColorStop(1, "#5927f5");
+  gradient3.addColorStop(0, color1);
+  gradient3.addColorStop(1, color2);
 
   const circles: any[] = [];
   const gradients = [gradient, gradient2, gradient3];
@@ -73,7 +88,7 @@ export function animatedCanvas(
   function randomswingCircle() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.globalAlpha = 1;
-    ctx.globalCompositeOperation = "luminosity";
+    ctx.globalCompositeOperation = defaultConfig.globalCompositeOperation!;
 
     for (let k = 0; k < circles.length; k++) {
       let swingpoints = circles[k];
@@ -134,7 +149,7 @@ export function animatedCanvas(
     ctx.lineWidth = k === 0 ? 16 : 3;
     ctx.shadowColor = shadowColor();
     ctx.strokeStyle = fillStyle;
-    ctx.shadowBlur = 45;
+    ctx.shadowBlur = defaultConfig.shadowBlur!;
 
     for (var i = 0; i < pts.length; i++) {
       ctx.quadraticCurveTo(
@@ -146,7 +161,7 @@ export function animatedCanvas(
     }
 
     ctx.closePath();
-    for (let index = 0; index < 6; index++) {
+    for (let index = 0; index < defaultConfig.strokeRepeat!; index++) {
       ctx.stroke();
     }
   }
