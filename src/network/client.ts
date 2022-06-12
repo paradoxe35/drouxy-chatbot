@@ -13,6 +13,7 @@ import type {
   IMessage,
   IUserMessageSTT,
   BotResponseEvent,
+  IUserSessionEmit,
 } from "../types";
 import { socketIO } from "./socket";
 import { screenMode } from "@src/store/store";
@@ -118,6 +119,15 @@ class Client {
       from_user: true,
       text,
     });
+  }
+
+  public $emit_login_session(data: IUserSessionEmit) {
+    this.socket.emit("login_session", data);
+    this.stores.screenMode.setMode("loading");
+  }
+
+  public $emit_logout_session() {
+    this.socket.emit("logout_session");
   }
 
   public $emit_user_message_stt(data: IUserMessageSTT) {

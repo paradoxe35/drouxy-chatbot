@@ -1,10 +1,10 @@
-from email.policy import default
 import os
 import json
 import asyncio
 import jellyfish
 import random
 import emoji
+import env
 
 dialog_data = {
     "fr": None,
@@ -20,8 +20,8 @@ jaro_distance_limit = 0.3
 
 default_message_entities = {
     "author": "Paradoxe",
+    "botName": env.get_env('BOT_NAME', 'Zora'),
     "language": "undefined",
-    "botName": "Drouxy",
     "name": "User Name",
     "geo-city": "Paris",
 }

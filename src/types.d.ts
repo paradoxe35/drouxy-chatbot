@@ -21,6 +21,13 @@ export type ILiveMessage = {
   last_partial: { partial: string };
 };
 
+export type IUserSessionEmit = {
+  username: string;
+  language: string;
+  geo_city?: string;
+  tts_enabled: boolean | number;
+};
+
 export type IAuthenticatedUser = {
   session_id: string;
   username: string;

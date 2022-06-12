@@ -10,7 +10,7 @@
     <div class={`message__items ${message.from_user ? "message__user" : ""}`}>
       {#if !message.from_user}
         <div class={`message__item-img`} out:fade>
-          <img src="/msg-icon.png" alt="Icon" />
+          <img src="/bot-logo.png" alt="Icon" />
         </div>
         <div class="message__item" in:swimrotate>
           {message.text}
@@ -26,7 +26,7 @@
   {#if $isBotSpeech}
     <div class={`message__items`}>
       <div class={`message__item-img waving`}>
-        <img src="/msg-icon.png" alt="Icon" />
+        <img src="/bot-logo.png" alt="Icon" />
       </div>
     </div>
   {/if}

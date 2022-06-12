@@ -1,4 +1,4 @@
-from models import User, Message
+from .models import User, Message
 from pony import orm
 
 

@@ -1,12 +1,33 @@
 <script lang="ts">
+  import { screenMode } from "@src/store/store";
   import Loader from "./components/Loader.svelte";
+  import Login from "./components/Login.svelte";
+  import { fade } from "svelte/transition";
+
+  let loading_timeout;
+
+  $: if ($screenMode === "loading") {
+    if (loading_timeout) clearTimeout(loading_timeout);
+    loading_timeout = window.setTimeout(() => {
+      // if in 30 seconds, the user has not logged in, then we show the login screen
+      if ($screenMode === "loading") {
+        screenMode.setMode("login");
+      }
+    }, 1 * 1000);
+  }
 </script>
 
 <div class="default__screen">
   <div class="color__screen" />
   <div class="screen_content">
-    {#if false}
-      <div class="loader">
+    {#if $screenMode !== "loading"}
+      <div class="login" out:fade>
+        <Login />
+      </div>
+    {/if}
+
+    {#if $screenMode === "loading"}
+      <div class="loader" in:fade>
         <Loader />
       </div>
     {/if}
