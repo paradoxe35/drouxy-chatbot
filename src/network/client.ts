@@ -86,6 +86,7 @@ class Client {
 
     // listen for live message event
     this.socket.on("stt_live_message", (data: ILiveMessage) => {
+      this.require_authentication();
       data.final = JSON.parse(<any>data.final);
       data.last_partial = JSON.parse(<any>data.last_partial);
       if (data.error === 0) {
@@ -96,6 +97,7 @@ class Client {
 
     // Get all session messages, this must be listened once
     this.socket.on("messages", ({ messages }: { messages: IMessage[] }) => {
+      this.require_authentication();
       this.stores.messages.setMessages(messages);
       window.setTimeout(() => {
         this.has_initial_messages = false;
