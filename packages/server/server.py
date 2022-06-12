@@ -118,8 +118,8 @@ def user_message(sid, data):
         bot_response(sid, data['text'], user_session)
 
 
-@sio.on('user_message_stt')
-def user_message_stt(sid, data):
+@sio.on('user_recording_stt')
+def user_recording_stt(sid, data):
     with sio.session(sid) as session:
         if 'user_session' not in session:
             return
@@ -140,11 +140,8 @@ def user_message_stt(sid, data):
                     'final': result,
                     'last_partial': last_partial
                 }
-                text = result['text']
                 # send the stt result to the client
-                sio.emit('stt-live-message', data, to=sid)
-                # Process bot response in a separate thread
-                bot_response(sid, text, user_session)
+                sio.emit('stt_live_message', data, to=sid)
 
         except Exception as e:
             data = {
@@ -152,7 +149,7 @@ def user_message_stt(sid, data):
                 'final': None,
                 'last_partial': None
             }
-            sio.emit('stt-live-message', data, to=sid)
+            sio.emit('stt_live_message', data, to=sid)
 
 
 @sio.event

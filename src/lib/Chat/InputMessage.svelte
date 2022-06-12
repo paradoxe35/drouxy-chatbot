@@ -1,6 +1,5 @@
 <script lang="ts">
   import {
-    messages,
     pendingSequenceMessageCounter,
     userLiveMessage,
   } from "@src/store/messages";
@@ -53,7 +52,7 @@
     hasRecorded = true;
     pendingSequenceMessageCounter.increment();
 
-    client_socket.$emit_user_message_stt({
+    client_socket.$emit_user_recording_stt({
       sampleRate: result.sampleRate,
       blob: result.blob,
       mimeType: EXPORT_MIME_TYPE,
@@ -80,7 +79,7 @@
 
     pendingSequenceMessageCounter.increment();
 
-    client_socket.$emit_user_message_stt({
+    client_socket.$emit_user_recording_stt({
       sampleRate: result.sampleRate,
       blob: result.blob,
       mimeType: EXPORT_MIME_TYPE,
@@ -97,7 +96,7 @@
 
   /** Close speechMode when pendingSequenceMessageCounter is 0 and holdMic is false */
   $: if ($pendingSequenceMessageCounter === 0 && !holdMic && hasRecorded) {
-    const wait_time = 1000;
+    const wait_time = 500;
     hasRecorded = false;
     setTimeout(() => speechMode.activate(false), wait_time);
 
@@ -108,12 +107,8 @@
       .trim();
     if (live_messages.length > 0 && msg.length > 0) {
       setTimeout(() => {
-        // Not need to emit this message to server, because it will be handled by the server
-        // Just show it
-        messages.addMessage({
-          text: msg,
-          from_bot: false,
-        });
+        // Send message to the server
+        client_socket.$emit_user_text_message(msg);
         userLiveMessage.reset();
       }, wait_time + 500);
     }

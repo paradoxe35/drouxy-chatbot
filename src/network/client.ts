@@ -79,7 +79,9 @@ class Client {
     });
 
     // listen for live message event
-    this.socket.on("stt-live-message", (data: ILiveMessage) => {
+    this.socket.on("stt_live_message", (data: ILiveMessage) => {
+      data.final = JSON.parse(<any>data.final);
+      data.last_partial = JSON.parse(<any>data.last_partial);
       if (data.error === 0) {
         this.stores.userLiveMessage.addMessage(data.final.text);
       }
@@ -158,9 +160,9 @@ class Client {
     });
   }
 
-  public $emit_user_message_stt(data: IUserMessageSTT) {
+  public $emit_user_recording_stt(data: IUserMessageSTT) {
     this.require_authentication();
-    this.socket.emit("user_message_stt", data);
+    this.socket.emit("user_recording_stt", data);
   }
 
   public $emit_change_language(language: string) {
