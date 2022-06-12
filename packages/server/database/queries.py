@@ -56,12 +56,23 @@ def get_messages(user_session: dict):
 
 
 @orm.db_session
-def add_message(user_session: dict, message: str, from_bot: bool):
+def change_language(user_session: dict, datas: dict):
+    if not required_keys(datas, ['language']):
+        return False
+    user = User.get(session_id=user_session['session_id'])
+    if not user:
+        return None
+    user.language = 'fr' if datas['language'] == 'fr' else 'en'
+    return user
+
+
+@orm.db_session
+def add_message(user_session: dict, text: str, from_bot: bool):
     user = User.get(session_id=user_session['session_id'])
     if not user:
         return False
     Message(
-        message=message,
+        text=text,
         from_bot=from_bot,
         customer=user
     )

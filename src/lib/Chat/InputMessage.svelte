@@ -7,13 +7,13 @@
   import { speechMode } from "@src/store/store";
   import { fade } from "svelte/transition";
   import RecorderController from "@src/utils/recorder-controller";
-  import socket from "@src/network/socket";
   import {
     AUDIO_NUM_CHANNELS,
     EXPORT_MIME_TYPE,
   } from "@src/utils/recorder/constants";
   import { debounce } from "@src/utils/debounce";
   import type IRecorder from "src/utils/recorder/index.d";
+  import { client_socket } from "@src/network/client";
 
   let holdMic = false;
   let textInput = "";
@@ -23,14 +23,10 @@
   // Mock start message from bot
   $: hasTextValue = textInput.trim().length > 0;
 
-  function sendMessage() {
+  function handleUserTextMessage() {
     if (!hasTextValue) return;
-    let messageText = textInput;
+    client_socket.$emit_user_text_message(textInput);
     textInput = "";
-    messages.addMessage({
-      text: messageText,
-      from_user: true,
-    });
   }
 
   /**
@@ -57,7 +53,7 @@
     hasRecorded = true;
     pendingSequenceMessageCounter.increment();
 
-    socket.sendSpeechRecorded({
+    client_socket.$emit_user_message_stt({
       sampleRate: result.sampleRate,
       blob: result.blob,
       mimeType: EXPORT_MIME_TYPE,
@@ -84,7 +80,7 @@
 
     pendingSequenceMessageCounter.increment();
 
-    socket.sendSpeechRecorded({
+    client_socket.$emit_user_message_stt({
       sampleRate: result.sampleRate,
       blob: result.blob,
       mimeType: EXPORT_MIME_TYPE,
@@ -93,14 +89,6 @@
   }
 
   r_controller.onRecordingEnd(debounce(handleEndRecording, 100));
-
-  // Get live message from socket
-  socket.liveMessageEvent((data) => {
-    if (data.error === 0) {
-      userLiveMessage.addMessage(data.final.text);
-    }
-    pendingSequenceMessageCounter.decrement();
-  });
 
   /** Notify store about voice controller request */
   $: if (holdMic) {
@@ -120,6 +108,8 @@
       .trim();
     if (live_messages.length > 0 && msg.length > 0) {
       setTimeout(() => {
+        // Not need to emit this message to server, because it will be handled by the server
+        // Just show it
         messages.addMessage({
           text: msg,
           from_user: true,
@@ -131,11 +121,11 @@
 </script>
 
 <div class="input__content">
-  <form class="input__field" on:submit|preventDefault={sendMessage}>
+  <form class="input__field" on:submit|preventDefault={handleUserTextMessage}>
     <input type="text" placeholder="You can type here" bind:value={textInput} />
     {#if hasTextValue}
       <button
-        on:click={sendMessage}
+        on:click={handleUserTextMessage}
         type="button"
         class="input__button"
         transition:fade={{ duration: 200 }}

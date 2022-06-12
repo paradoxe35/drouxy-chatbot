@@ -17,7 +17,7 @@ class User(connector.db.Entity):
 
 class Message(connector.db.Entity):
     id = orm.PrimaryKey(int, auto=True)
-    message = orm.Required(str)
+    text = orm.Required(str)
     from_bot = orm.Required(bool)
     timestamp = orm.Required(datetime, sql_default='CURRENT_TIMESTAMP')
     customer = orm.Required(User)

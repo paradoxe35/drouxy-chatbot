@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { isBotTyping } from "@src/store/store";
+  import { isBotSpeech } from "@src/store/bot";
   import { messages } from "@src/store/messages";
   import { swimrotate } from "@src/utils/animations/transitions";
   import { fade } from "svelte/transition";
@@ -23,7 +23,7 @@
     </div>
   {/each}
 
-  {#if $isBotTyping}
+  {#if $isBotSpeech}
     <div class={`message__items`}>
       <div class={`message__item-img waving`}>
         <img src="/msg-icon.png" alt="Icon" />
@@ -39,6 +39,11 @@
     width: 100%;
     height: 100%;
     overflow-y: auto;
+    &::-webkit-scrollbar {
+      display: none;
+    }
+    -ms-overflow-style: none;
+    scrollbar-width: none;
   }
 
   .message__items {

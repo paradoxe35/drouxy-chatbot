@@ -1,15 +1,11 @@
 <script lang="ts">
-  import socket from "@src/network/socket";
   import { speechMode } from "@src/store/store";
   import InputMessage from "./Chat/InputMessage.svelte";
   import MessageContent from "./Chat/MessageContent.svelte";
   import VoiceSpeech from "./Chat/VoiceSpeech.svelte";
   import RecorderController from "@src/utils/recorder-controller";
   import { onMount } from "svelte";
-  import {
-    pendingSequenceMessageCounter,
-    userLiveMessage,
-  } from "@src/store/messages";
+  import { client_socket } from "@src/network/client";
 
   onMount(() => {
     /**
@@ -17,11 +13,7 @@
      */
     RecorderController.init();
 
-    // Clear all message store when socket connect failed
-    socket.io.on("connect_failed", () => {
-      userLiveMessage.reset();
-      pendingSequenceMessageCounter.reset();
-    });
+    client_socket.init();
   });
 </script>
 

@@ -12,14 +12,16 @@ function createSpeechModeStore() {
 
 export const speechMode = createSpeechModeStore();
 
-// Create is typing store
-function createIsBotTypingStore() {
-  const { subscribe, set } = writable<boolean>(false);
+// Create screen mode store
+type ScreenMode = "loading" | "chat" | "speech";
+
+function createScreenModeStore() {
+  const { subscribe, set } = writable<ScreenMode>("loading");
 
   return {
     subscribe,
-    activate: (status: boolean) => set(status),
+    setMode: (mode: ScreenMode) => set(mode),
   };
 }
 
-export const isBotTyping = createIsBotTypingStore();
+export const screenMode = createScreenModeStore();

@@ -1,18 +1,19 @@
+import type { IMessage } from "@src/types";
 import { writable } from "svelte/store";
 
-export type Message = {
-  from_user?: boolean;
-  waving?: boolean;
-  text?: string;
-};
-
 function createMessageStore() {
-  const { subscribe, update } = writable<Message[]>([]);
+  const { subscribe, update, set } = writable<IMessage[]>([]);
 
   return {
     subscribe,
-    addMessage: (message: Message) => {
+    addMessage: (message: IMessage) => {
       update((messages) => [...messages, message]);
+    },
+    reset: () => {
+      set([]);
+    },
+    setMessages: (messages: IMessage[]) => {
+      set(messages);
     },
   };
 }

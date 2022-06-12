@@ -21,7 +21,7 @@ sio = socketio.Server(async_mode='eventlet',
 app = socketio.WSGIApp(sio, static_files=None)
 
 
-def bot_response(sid, message: str, user_session: dict):
+def bot_response(sid, message: str, user_session: dict, default_message=False):
     global sio
     """
     Generate a response from the bot.
@@ -40,11 +40,13 @@ def bot_response(sid, message: str, user_session: dict):
             response) if user_language == 'fr' else tts_en(response)
         if audio_byte:
             sio.emit('tts_bot_response', {
-                     'audio': audio_byte, "text": response}, to=sid)
+                     'audio': audio_byte, "message": response}, to=sid)
     else:
         sio.emit('bot_response', {'message': response}, to=sid)
-    # Save message on the database from the user
-    queries.add_message(user_session, message, False)
+
+    if default_message == False:
+        # Save message on the database from the user
+        queries.add_message(user_session, message, False)
     # Save message on the database from the bot
     queries.add_message(user_session, response, True)
 
@@ -61,8 +63,8 @@ def connect(sid, environ, auth):
     print('connect ------------', sid)
 
 
-@sio.on('connect_session')
-def connect_session(sid, data):
+@sio.on('login_session')
+def login_session(sid, data):
     with sio.session(sid) as session:
         user_session = queries.authenticate_user(sid, data)
         if not user_session:
@@ -72,11 +74,12 @@ def connect_session(sid, data):
         sio.emit('authenticated', {**user_session,
                  "first_connect": True}, to=sid)
         # send the welcome message
-        executor.submit(bot_response, sid, "Hello", user_session)
+        default_message = "Salut" if user_session['language'] == 'fr' else "Hello"
+        executor.submit(bot_response, sid, default_message, user_session, True)
         executor.shutdown(wait=False)
 
 
-@sio.on('disconnect_session')
+@sio.on('logout_session')
 def disconnect_session(sid):
     with sio.session(sid) as session:
         if 'user_session' in session:
@@ -93,6 +96,15 @@ def messages(sid):
         user_session = session['user_session']
         messages = queries.get_messages(user_session)
         sio.emit('messages', {'messages': messages}, to=sid)
+
+
+@sio.on('change_language')
+def change_language(sid, data):
+    with sio.session(sid) as session:
+        if 'user_session' not in session:
+            return False
+        new_user = queries.change_language(session['user_session'], data)
+        sio.emit('authenticated', new_user, to=sid)
 
 
 @sio.on('user_message')
@@ -133,7 +145,7 @@ def user_message_stt(sid, data):
                 executor.submit(bot_response, sid, text, user_session)
                 executor.shutdown(wait=False)
                 # send the stt result to the client
-                sio.emit('live-message', data, to=sid)
+                sio.emit('stt-live-message', data, to=sid)
 
         except Exception as e:
             data = {
@@ -141,7 +153,7 @@ def user_message_stt(sid, data):
                 'final': None,
                 'last_partial': None
             }
-            sio.emit('live-message', data, to=sid)
+            sio.emit('stt-live-message', data, to=sid)
 
 
 @sio.event
