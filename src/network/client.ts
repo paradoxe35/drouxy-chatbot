@@ -125,7 +125,7 @@ class Client {
     this.stores.messages.setMessages([]);
     this.stores.userLiveMessage.reset();
     this.stores.pendingSequenceMessageCounter.reset();
-    this.remove_authenticated_storage();
+    // this.remove_authenticated_storage();
   }
 
   private require_authentication() {
@@ -146,6 +146,7 @@ class Client {
     return null;
   }
 
+  // @ts-ignore
   private remove_authenticated_storage() {
     sessionStorage.removeItem(this.sessionStorageKey);
   }
