@@ -1,6 +1,5 @@
 <script lang="ts">
   import { client_socket } from "@src/network/client";
-
   import { isBotSpeech } from "@src/store/bot";
   import { messages } from "@src/store/messages";
   import { swimrotate } from "@src/utils/animations/transitions";
