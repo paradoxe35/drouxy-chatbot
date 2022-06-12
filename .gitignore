@@ -27,3 +27,4 @@ exemples/
 venv/
 venv3/
 .venv/
+.env.local
