@@ -86,7 +86,7 @@ def generate_response(text: str, language: str) -> str:
 async def bulck_dialog(message: str, message_entities: dict):
     loop = asyncio.get_event_loop()
     language = 'fr' if message_entities['language'] == 'fr' else 'en'
-    future_message = await loop.run_in_executor(None, generate_response, message, language)
+    future_message, intent, probability = await loop.run_in_executor(None, generate_response, message, language)
     is_emoji = False
     if len(future_message) <= 2:
         is_emoji = bool(emoji.get_emoji_regexp().search(future_message))

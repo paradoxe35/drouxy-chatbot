@@ -13,7 +13,7 @@
       if ($screenMode === "loading") {
         screenMode.setMode("login");
       }
-    }, 1 * 1000);
+    }, 30 * 1000);
   }
 </script>
 

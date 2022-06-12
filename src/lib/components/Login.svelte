@@ -1,7 +1,5 @@
 <script lang="ts">
   import { client_socket } from "@src/network/client";
-
-  import { typewriter } from "@src/utils/animations/transitions";
   import { BOT_NAME } from "@src/utils/constants";
 
   let username = "";
@@ -51,7 +49,7 @@
   </div>
 
   <div class="welcome__text">
-    <span transition:typewriter>
+    <span>
       Hey, I'm {BOT_NAME}. If you would like to chat with me, please complete
       the form below before 🙂.
     </span>

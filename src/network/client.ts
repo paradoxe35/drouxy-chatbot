@@ -44,9 +44,6 @@ class Client {
       };
     }
 
-    // connect to socket after getting authenticated user
-    this.socket.connect();
-
     // Clear all message store when socket connect failed
     this.socket.on("connect_failed", () => {
       this.stores.userLiveMessage.reset();
@@ -89,11 +86,20 @@ class Client {
 
     // listen for new message with event from bot
     this.socket.on("bot_response", this.$event_bot_response);
+
+    // connect to socket after getting authenticated user
+    this.socket.open();
   }
 
   private unauthenticate() {
     this.authenticatedUser = null;
     this.stores.authenticatedUser.logout();
+  }
+
+  private require_authentication() {
+    if (!this.authenticatedUser) {
+      throw new Error("Authentication required");
+    }
   }
 
   private get_authenticated_storage(): IAuthenticatedEvent | null {
@@ -113,7 +119,19 @@ class Client {
     return sessionStorage.setItem("dxr_authenticated", JSON.stringify(data));
   }
 
+  public $emit_login_session(data: IUserSessionEmit) {
+    this.socket.emit("login_session", data);
+    this.stores.screenMode.setMode("loading");
+  }
+
+  public $emit_logout_session() {
+    this.require_authentication();
+    this.socket.emit("logout_session");
+  }
+
   public $emit_user_text_message(text: string) {
+    this.require_authentication();
+
     this.socket.emit("user_message", { text });
     this.stores.messages.addMessage({
       from_user: true,
@@ -121,24 +139,21 @@ class Client {
     });
   }
 
-  public $emit_login_session(data: IUserSessionEmit) {
-    this.socket.emit("login_session", data);
-    this.stores.screenMode.setMode("loading");
-  }
-
-  public $emit_logout_session() {
-    this.socket.emit("logout_session");
-  }
-
   public $emit_user_message_stt(data: IUserMessageSTT) {
+    this.require_authentication();
     this.socket.emit("user_message_stt", data);
   }
 
   public $emit_change_language(language: string) {
+    this.require_authentication();
     this.socket.emit("change_language", { language });
   }
 
   private $event_bot_response(data: BotResponseEvent) {
+    this.require_authentication();
+
+    console.log(data.audio);
+
     if (data.audio) {
       const blob = new Blob([data.audio], {
         type: "audio/wav",

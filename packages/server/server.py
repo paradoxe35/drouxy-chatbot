@@ -3,15 +3,13 @@ import socketio
 import env
 import wave
 import tempfile
+from database.connector import startup_database
 from stt.client import stt_en, stt_fr
 from tts.client import tts_en, tts_fr
 from database import queries
 # mock_dialog
 from mock.mock_dialog import mock_dialog
-from concurrent.futures import ThreadPoolExecutor
 
-
-executor = ThreadPoolExecutor(max_workers=4)
 
 # get allowed origins from env.py and parse it to a list
 cors_allowed_origins = list(env.get_env('ALLOWED_ORIGINS').split(','))
@@ -56,10 +54,10 @@ def connect(sid, environ, auth):
     user_session = queries.check_user_authentication(auth, environ)
     if not user_session:
         sio.emit('authentication_failed', to=sid)
-        return False
-    with sio.session(sid) as session:
-        session['user_session'] = user_session
-        sio.emit('authenticated', user_session, to=sid)
+    else:
+        with sio.session(sid) as session:
+            session['user_session'] = user_session
+            sio.emit('authenticated', user_session, to=sid)
     print('connect ------------', sid)
 
 
@@ -75,8 +73,7 @@ def login_session(sid, data):
                  "first_connect": True}, to=sid)
         # send the welcome message
         default_message = "Salut" if user_session['language'] == 'fr' else "Hello"
-        executor.submit(bot_response, sid, default_message, user_session, True)
-        executor.shutdown(wait=False)
+        bot_response(sid, default_message, user_session, True)
 
 
 @sio.on('logout_session')
@@ -116,8 +113,7 @@ def user_message(sid, data):
             return
         user_session = session['user_session']
         # Process bot response in a separate thread
-        executor.submit(bot_response, sid, data['text'], user_session)
-        executor.shutdown(wait=False)
+        bot_response(sid, data['text'], user_session)
 
 
 @sio.on('user_message_stt')
@@ -143,11 +139,10 @@ def user_message_stt(sid, data):
                     'last_partial': last_partial
                 }
                 text = result['text']
-                # Process bot response in a separate thread
-                executor.submit(bot_response, sid, text, user_session)
-                executor.shutdown(wait=False)
                 # send the stt result to the client
                 sio.emit('stt-live-message', data, to=sid)
+                # Process bot response in a separate thread
+                bot_response(sid, text, user_session)
 
         except Exception as e:
             data = {
@@ -165,5 +160,8 @@ def disconnect(sid):
 
 # run app
 if __name__ == '__main__':
+    # startup_database
+    startup_database()
+    #  Start the socketio server
     port = int(env.get_env('SERVER_PORT'))
     eventlet.wsgi.server(eventlet.listen(('', port)), app)

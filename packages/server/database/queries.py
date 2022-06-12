@@ -11,14 +11,27 @@ def required_keys(datas={}, required=[]):
     return True
 
 
+def to_object(datas={}):
+    for key, value in datas.items():
+        if type(value) is not str and type(value) is not int and type(value) is not bool:
+            datas[key] = str(value)
+    return datas
+
+
+def to_object_list(datas=[]):
+    return [to_object(data.to_dict()) for data in datas]
+
+
 @orm.db_session
 def check_user_authentication(auth, environ):
+    if not auth:
+        return False
     if not required_keys(auth, ['username', 'session_id']):
         return False
     user = User.get(session_id=auth['session_id'])
     if not user:
         return False
-    return user
+    return to_object(user.to_dict())
 
 
 @orm.db_session
@@ -34,9 +47,7 @@ def authenticate_user(sid: str, datas: dict):
         geo_city=geo_city
     )
 
-    user.flush()
-
-    return user
+    return to_object(user.to_dict())
 
 
 @orm.db_session
@@ -52,7 +63,8 @@ def get_messages(user_session: dict):
     user = User.get(session_id=user_session['session_id'])
     if not user:
         return []
-    return user.messages
+    messages = user.messages
+    return to_object_list(messages)
 
 
 @orm.db_session
@@ -63,7 +75,8 @@ def change_language(user_session: dict, datas: dict):
     if not user:
         return None
     user.language = 'fr' if datas['language'] == 'fr' else 'en'
-    return user
+
+    return to_object(user.to_dict())
 
 
 @orm.db_session
