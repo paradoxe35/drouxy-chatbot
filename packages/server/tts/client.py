@@ -14,7 +14,7 @@ FR_VOICE = "fr-fr/siwis-glow_tts"
 
 VOCODER = "hifi_gan/universal_large"
 
-DENOISER_STRENGTH = 0.005
+DENOISER_STRENGTH = 0.000
 
 NOISE_SCALE = 0.333
 
