@@ -6,10 +6,10 @@ import aiohttp
 import env
 import logging
 from urllib.parse import urlencode
+from .voices import EN_SUPPORTED_LANGUAGES, FR_SUPPORTED_LANGUAGES
 
 
 EN_VOICE = "en-us/cmu_slt-glow_tts"
-
 FR_VOICE = "fr-fr/siwis-glow_tts"
 
 VOCODER = "hifi_gan/universal_large"
@@ -20,8 +20,11 @@ NOISE_SCALE = 0.333
 
 LENGTH_SCALE = 1
 
+TTS_VOICE_EN = env.get_env('TTS_EN_VOICE')
+TTS_VOICE_FR = env.get_env('TTS_FR_VOICE')
+
 defaultEnConfig = {
-    "voice": EN_VOICE,
+    "voice": TTS_VOICE_EN if TTS_VOICE_EN in EN_SUPPORTED_LANGUAGES else EN_VOICE,
     "vocoder": VOCODER,
     "denoiserStrength": DENOISER_STRENGTH,
     "noiseScale": NOISE_SCALE,
@@ -29,7 +32,7 @@ defaultEnConfig = {
 }
 
 defaultFrConfig = {
-    "voice": FR_VOICE,
+    "voice": TTS_VOICE_FR if TTS_VOICE_FR in FR_SUPPORTED_LANGUAGES else FR_VOICE,
     "vocoder": VOCODER,
     "denoiserStrength": DENOISER_STRENGTH,
     "noiseScale": NOISE_SCALE,
