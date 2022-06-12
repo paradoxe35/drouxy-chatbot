@@ -42,7 +42,7 @@ export type IAuthenticatedEvent = {
 } & IAuthenticatedUser;
 
 export type IMessage = {
-  from_user: boolean;
+  from_bot: boolean;
   text: string;
   timestamp?: string;
   id?: string;

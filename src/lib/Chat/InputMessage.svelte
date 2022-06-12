@@ -112,7 +112,7 @@
         // Just show it
         messages.addMessage({
           text: msg,
-          from_user: true,
+          from_bot: false,
         });
         userLiveMessage.reset();
       }, wait_time + 500);

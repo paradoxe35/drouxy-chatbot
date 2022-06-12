@@ -1,22 +1,48 @@
 <script lang="ts">
+  import { client_socket } from "@src/network/client";
+
   import { isBotSpeech } from "@src/store/bot";
   import { messages } from "@src/store/messages";
   import { swimrotate } from "@src/utils/animations/transitions";
   import { fade } from "svelte/transition";
+
+  let container: HTMLDivElement | null = null;
+  const cs = client_socket;
+
+  $: $messages,
+    (() => {
+      if ($messages.length > 0 && container) {
+        requestAnimationFrame(() => {
+          container!.scrollTo({
+            top: container!.scrollHeight,
+            behavior: "smooth",
+          });
+        });
+      }
+    })();
 </script>
 
-<div class="message__content">
+<div class="message__content" bind:this={container}>
   {#each $messages as message, index (index)}
-    <div class={`message__items ${message.from_user ? "message__user" : ""}`}>
-      {#if !message.from_user}
+    <div class={`message__items ${!message.from_bot ? "message__user" : ""}`}>
+      {#if message.from_bot}
         <div class={`message__item-img`} out:fade>
           <img src="/bot-logo.png" alt="Icon" />
         </div>
-        <div class="message__item" in:swimrotate>
+        <div
+          class="message__item"
+          in:swimrotate={{ duration: cs.has_initial_messages ? 0 : 200 }}
+        >
           {message.text}
         </div>
       {:else}
-        <div class="message__item" in:swimrotate={{ right: true }}>
+        <div
+          class="message__item"
+          in:swimrotate={{
+            right: true,
+            duration: cs.has_initial_messages ? 0 : 200,
+          }}
+        >
           {message.text}
         </div>
       {/if}
@@ -44,6 +70,10 @@
     }
     -ms-overflow-style: none;
     scrollbar-width: none;
+
+    .message__items:last-child {
+      margin-bottom: 5rem;
+    }
   }
 
   .message__items {

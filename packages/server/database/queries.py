@@ -63,7 +63,7 @@ def get_messages(user_session: dict):
     user = User.get(session_id=user_session['session_id'])
     if not user:
         return []
-    messages = user.messages
+    messages = user.messages.order_by(Message.id.asc)
     return to_object_list(messages)
 
 

@@ -17,9 +17,11 @@ import type {
 } from "../types";
 import { socketIO } from "./socket";
 import { screenMode } from "@src/store/store";
+import wait from "@src/utils/wait";
 
 class Client {
-  public authenticatedUser: IAuthenticatedUser | null = null;
+  private authenticatedUser: IAuthenticatedUser | null = null;
+  public has_initial_messages: boolean = false;
 
   private readonly stores = {
     userLiveMessage,
@@ -60,6 +62,10 @@ class Client {
       if (import.meta.env.VITE_PERSISTE_SESSION === "true") {
         this.set_authenticated_storage(data);
       }
+      // if not first time authenticated, then get messages
+      if (!data.first_connect) {
+        this.$emit_get_messages();
+      }
     });
 
     this.socket.on("authentication_failed", () => {
@@ -81,8 +87,11 @@ class Client {
     });
 
     // Get all session messages, this must be listened once
-    this.socket.on("messages", (messages: IMessage[]) => {
+    this.socket.on("messages", ({ messages }: { messages: IMessage[] }) => {
       this.stores.messages.setMessages(messages);
+      window.setTimeout(() => {
+        this.has_initial_messages = false;
+      }, 100);
     });
 
     // listen for new message with event from bot
@@ -133,12 +142,18 @@ class Client {
     this.socket.emit("logout_session");
   }
 
+  public $emit_get_messages() {
+    this.require_authentication();
+    this.socket.emit("messages");
+    this.has_initial_messages = true;
+  }
+
   public $emit_user_text_message(text: string) {
     this.require_authentication();
 
     this.socket.emit("user_message", { text });
     this.stores.messages.addMessage({
-      from_user: true,
+      from_bot: false,
       text,
     });
   }
@@ -153,8 +168,9 @@ class Client {
     this.socket.emit("change_language", { language });
   }
 
-  private $event_bot_response(data: BotResponseEvent) {
+  private async $event_bot_response(data: BotResponseEvent) {
     this.require_authentication();
+
     if (data.audio) {
       const blob = new Blob([data.audio], {
         type: "audio/wav",
@@ -169,10 +185,11 @@ class Client {
         URL.revokeObjectURL(url);
 
         // show bot response message text with a delay
-        window.setTimeout(() => {
+        window.setTimeout(async () => {
+          await wait(500);
           this.stores.isBotSpeech.activate(false);
           this.stores.messages.addMessage({
-            from_user: false,
+            from_bot: true,
             text: data.message,
           });
         }, 500);
@@ -186,8 +203,9 @@ class Client {
       return;
     }
 
+    await wait(500);
     this.stores.messages.addMessage({
-      from_user: false,
+      from_bot: true,
       text: data.message,
     });
   }
