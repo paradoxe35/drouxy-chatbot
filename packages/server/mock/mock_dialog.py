@@ -16,7 +16,7 @@ dialog_files = {
     "en": "%s/mock/dialogs_en.json" % os.getcwd()
 }
 
-search_distance_limit = 10
+search_distance_limit = 0.8
 
 default_message_entities = {
     "author": "Paradoxe",
@@ -59,13 +59,13 @@ def text_occurrences(text: str, user_language: str):
     for key in intents_keys:
         intent = intents[key]
         for exemple in intent['examples']:
-            similarity = jellyfish.damerau_levenshtein_distance(
+            similarity = jellyfish.jaro_distance(
                 u"%s" % text.lower(), u"%s" % exemple.lower())
-            if last_similar_probability == None and last_similar_intent == None and similarity <= search_distance_limit:
+            if last_similar_probability == None and last_similar_intent == None and similarity >= search_distance_limit:
                 last_similar_intent = key
                 last_similar_probability = similarity
 
-            if last_similar_intent != None and similarity < last_similar_probability:
+            if last_similar_intent != None and similarity > last_similar_probability:
                 last_similar_intent = key
                 last_similar_probability = similarity
 
@@ -78,11 +78,12 @@ def text_occurrences(text: str, user_language: str):
 
 
 def generate_response(text: str, user_language: str) -> str:
-    intent, probability, responses = text_occurrences(text, user_language)
+    intent, probability, responses, actions = text_occurrences(
+        text, user_language)
     try:
-        return random.choice(responses), intent, probability,
+        return random.choice(responses), intent, probability, actions
     except:
-        return '😔', intent, probability
+        return '😔', intent, probability, actions
 
 
 async def bulck_dialog(message: str, message_entities: dict):
