@@ -9,11 +9,11 @@
   $: if ($screenMode === "loading") {
     if (loading_timeout) clearTimeout(loading_timeout);
     loading_timeout = window.setTimeout(() => {
-      // if in 30 seconds, the user has not logged in, then we show the login screen
+      // if in 15 seconds, the user has not logged in, then we show the login screen
       if ($screenMode === "loading") {
         screenMode.setMode("login");
       }
-    }, 30 * 1000);
+    }, 15 * 1000);
   }
 </script>
 
