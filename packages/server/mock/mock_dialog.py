@@ -70,9 +70,11 @@ def text_occurrences(text: str, user_language: str):
                 last_similar_probability = similarity
 
     if last_similar_intent != None:
-        return last_similar_intent, last_similar_probability, intents[last_similar_intent]['responses']
+        responses = intents[last_similar_intent]['responses']
+        actions = intents[last_similar_intent]['actions']
+        return last_similar_intent, last_similar_probability, responses, actions
     else:
-        return None, None, fallbacks
+        return None, None, fallbacks, ['fallback']
 
 
 def generate_response(text: str, user_language: str) -> str:
@@ -86,7 +88,7 @@ def generate_response(text: str, user_language: str) -> str:
 async def bulck_dialog(message: str, message_entities: dict):
     loop = asyncio.get_event_loop()
     user_language = message_entities['user_language']
-    future_message, intent, probability = await loop.run_in_executor(None, generate_response, message, user_language)
+    future_message, intent, probability, actions = await loop.run_in_executor(None, generate_response, message, user_language)
     is_emoji = False
     if len(future_message) <= 2:
         is_emoji = bool(emoji.get_emoji_regexp().search(future_message))
