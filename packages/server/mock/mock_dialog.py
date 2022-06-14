@@ -23,7 +23,7 @@ dialog_files = {
     "en": "%s/mock/dialogs_en.json" % os.getcwd()
 }
 
-search_distance_limit = 0.85  # 0.0 to 1.0
+search_distance_limit = 0.8  # 0.0 to 1.0
 
 default_message_entities = {
     "author": "Paradoxe",
