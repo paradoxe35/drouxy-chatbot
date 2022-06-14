@@ -32,7 +32,7 @@
           class="message__item"
           in:swimrotate={{ duration: cs.has_initial_messages ? 0 : 200 }}
         >
-          {message.text}
+          {@html message.text}
         </div>
       {:else}
         <div
@@ -42,7 +42,7 @@
             duration: cs.has_initial_messages ? 0 : 200,
           }}
         >
-          {message.text}
+          {@html message.text}
         </div>
       {/if}
     </div>
@@ -92,13 +92,14 @@
   }
 
   .message__items .message__item-img {
+    --img-with: 50px;
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: var(--img-with);
+    height: auto;
     margin-top: -15px;
     border-radius: 50%;
     img {
-      width: 100%;
+      width: var(--img-with);
       height: auto;
     }
 
@@ -160,6 +161,12 @@
     --raduis: 18px;
     border-radius: var(--raduis);
     border-top-left-radius: 0;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+    :global(a) {
+      color: #616efd;
+    }
   }
 
   @keyframes wave-beat {

@@ -35,24 +35,26 @@ def bot_response(sid: str, message: str, user_session: dict, default_message=Fal
         "geo-city": user_session['geo_city'],
     }
     # get the response from the bot
-    response, is_emoji = mock_dialog(message, message_entities)
+    bot_response, is_emoji, append_response = mock_dialog(
+        message, message_entities)
+    text_bot_response = bot_response + append_response
 
     if user_session['tts_enabled'] == True and is_emoji == False:
         audio_byte, err = tts_fr(
-            response) if user_language == 'fr' else tts_en(response)
+            bot_response) if user_language == 'fr' else tts_en(bot_response)
         if audio_byte:
             sio.emit('tts_bot_response', {
-                     'audio': audio_byte, "message": response}, to=sid)
+                     'audio': audio_byte, "message": text_bot_response}, to=sid)
         else:
-            sio.emit('bot_response', {"message": response}, to=sid)
+            sio.emit('bot_response', {"message": text_bot_response}, to=sid)
     else:
-        sio.emit('bot_response', {'message': response}, to=sid)
+        sio.emit('bot_response', {'message': text_bot_response}, to=sid)
 
     if default_message == False:
         # Save message on the database from the user
         queries.add_message(user_session, message, False)
     # Save message on the database from the bot
-    queries.add_message(user_session, response, True)
+    queries.add_message(user_session, text_bot_response, True)
 
 
 @sio.event
