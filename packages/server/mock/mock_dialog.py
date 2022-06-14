@@ -5,6 +5,12 @@ import jellyfish
 import random
 import emoji
 import env
+import wikipedia
+import logging
+
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
+
 
 dialog_data = {
     "fr": None,
@@ -86,19 +92,41 @@ def generate_response(text: str, user_language: str) -> str:
         return '😔', intent, probability, actions
 
 
+def wikipedia_search(message: str, user_language: str):
+    message = message.lower().replace('wikipedia', '')
+    wikipedia.set_lang(user_language)
+    try:
+        wikipedia_response = wikipedia.summary(message, sentences=1)
+        intro = "Voici ce que j'ai trouvé sur le net: \n" if user_language == "fr" else "Here is what I found on the web: \n"
+        return intro + wikipedia_response
+    except:
+        return None
+
+
 async def bulck_dialog(message: str, message_entities: dict):
     loop = asyncio.get_event_loop()
     user_language = message_entities['user_language']
     future_message, intent, probability, actions = await loop.run_in_executor(None, generate_response, message, user_language)
     is_emoji = False
     if len(future_message) <= 2:
-        is_emoji = bool(emoji.get_emoji_regexp().search(future_message))
+        # is_emoji = bool(emoji.get_emoji_regexp().search(future_message))
+        is_emoji = True
 
     # Replace entities with message_entities
     message_entities = {
         **default_message_entities,
         **message_entities
     }
+
+    # Search on wikipedia
+    if len(actions) > 0 and actions[0] == 'fallback':
+        wikipedia_response = await loop.run_in_executor(None, wikipedia_search, message, user_language)
+        if wikipedia_response != None:
+            future_message = wikipedia_response
+
+    logging.info('---- actions %s' % actions, '----intent %s' % intent, '---- probability %s' %
+                 probability, '---- future_message %s' % future_message)
+
     for key, value in message_entities.items():
         future_message = future_message.replace(f'${key}', value)
     return future_message, is_emoji

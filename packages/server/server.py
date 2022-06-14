@@ -1,5 +1,6 @@
 import eventlet
 import socketio
+import logging
 import env
 import wave
 import tempfile
@@ -9,6 +10,9 @@ from tts.client import tts_en, tts_fr
 from database import queries
 # mock_dialog
 from mock.mock_dialog import mock_dialog
+
+
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
 
 
 # get allowed origins from env.py and parse it to a list
@@ -60,7 +64,7 @@ def connect(sid, environ, auth):
         with sio.session(sid) as session:
             session['user_session'] = user_session
             sio.emit('authenticated', user_session, to=sid)
-    print('connect ------------', sid)
+    logging.info('connect ------------', sid)
 
 
 @sio.on('login_session')
@@ -167,7 +171,7 @@ def user_recording_stt(sid, data):
 
 @sio.event
 def disconnect(sid):
-    print('disconnect ---------------', sid)
+    logging.info('disconnect ---------------', sid)
 
 
 # run app
