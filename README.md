@@ -46,6 +46,6 @@ Sample Dataset
 
 You can extend this project on your side to make it more interesting with any machine learning framework or other. here are a few if you are interested
 
-- ### [wit.ai](https://wit.ai/): Wit.ai makes it easy for developers to build applications and devices that you can talk or text to.
+- [Wit.ai](https://wit.ai/): Wit.ai makes it easy for developers to build applications and devices that you can talk or text to.
 
-- ### [Rasa](https://rasa.com/open-source/): Rasa Open Source supplies the building blocks for creating virtual assistants. Use Rasa to automate human-to-computer interactions anywhere from websites to social media platforms.
+- [Rasa](https://rasa.com/open-source/): Rasa Open Source supplies the building blocks for creating virtual assistants. Use Rasa to automate human-to-computer interactions anywhere from websites to social media platforms.
