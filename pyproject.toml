@@ -18,6 +18,7 @@ aiofiles = "^0.8.0"
 unsync = "^1.4.0"
 emoji = "^1.7.0"
 uuid = "^1.30"
+wikipedia = "^1.4.0"
 
 [tool.poetry.dev-dependencies]
 autopep8 = "^1.6.0"
