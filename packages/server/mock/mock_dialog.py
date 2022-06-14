@@ -94,6 +94,8 @@ def generate_response(text: str, user_language: str) -> str:
 
 def wikipedia_search(message: str, user_language: str):
     message = message.lower().replace('wikipedia', '')
+    if message.strip().startswith('search'):
+        message = message.replace('search', '').strip()
     wikipedia.set_lang(user_language)
     try:
         wikipedia_response = wikipedia.summary(message, sentences=1)
