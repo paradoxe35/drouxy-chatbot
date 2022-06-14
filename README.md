@@ -1,4 +1,4 @@
-# Drouxy Assistant
+# Drouxy Chatbot
 
 This is a simple chatbot implementation, the goal is to give a model to those who want to get started or get inspired.
 
