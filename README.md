@@ -1,6 +1,8 @@
 # Drouxy Assistant
 
-This template should help get you started developing with Svelte and TypeScript in Vite.
+This is a simple chatbot implementation, the goal is to give a model to those who want to get started or get inspired.
+
+Demo:
 
 ![Demo](mock/ezgif-1-f3f8ddf8b7.gif)
 
@@ -8,30 +10,42 @@ Souce: [link](https://dribbble.com/shots/14782390-Meet-Chatbot-Elwa-powered-by-u
 
 ## Get Started
 
-**Why use this over SvelteKit?**
 
-- It brings its own routing solution which might not be preferable for some users.
-- It is first and foremost a framework that just happens to use Vite under the hood, not a Vite app.
-  `vite dev` and `vite build` wouldn't work in a SvelteKit environment, for example.
+### **Requirements**
+Here are the tools you should have on your local or remote computer to get started.
+- [NodeJS](https://nodejs.org)
+- [PNPM](https://pnpm.io/)
+- [Python](https://www.python.org/)
+- [Poetry](https://python-poetry.org/)
+- [Docker](https://www.docker.com/) - Optional (used for text to speech and speech to text) 
 
-This template contains as little as possible to get started with Vite + TypeScript + Svelte, while taking into account the developer experience with regards to HMR and intellisense. It demonstrates capabilities on par with the other `create-vite` templates and is a good starting point for beginners dipping their toes into a Vite + Svelte project.
+### **Installation** (test)
 
-Should you later need the extended capabilities and extensibility provided by SvelteKit, the template has been structured similarly to SvelteKit so that it is easy to migrate.
+Before starting the installation, you can take a look at `.env` file
 
-**Why `global.d.ts` instead of `compilerOptions.types` inside `jsconfig.json` or `tsconfig.json`?**
+Commands: 
 
-Setting `compilerOptions.types` shuts out all other types not explicitly listed in the configuration. Using triple-slash references keeps the default TypeScript setting of accepting type information from the entire workspace, while also adding `svelte` and `vite/client` type information.
+- `make install` - (Install project dependencies)
+- `make install-speech` - Install docker services for tts (text to speech) and stt (speech to text)
+- `pnpm run preview:all` - start the chatbot server on http://localhost:4173
 
 
-```ts
-// store.ts
-// An extremely simple external store
-import { writable } from 'svelte/store'
-export default writable(0)
-```
+> If you don't have make on your OS, you can check the `Makefile` and run these commands manually
 
-## Extends
 
-- ### [wit.ai](https://wit.ai/)
 
-- ### [Rasa](https://rasa.com/open-source/)
+## Models
+
+In fact, there is no machine learning process to automate the conversations, instead we used a simple dataset with some conditions to make the current state more interesting, you can check that here `packages/server/mock/mock_dialog.py`
+
+Sample Dataset
+- French Language (`mock/dialogs_fr.json`)
+- English Language (`mock/dialogs_en.json`)
+
+## Extend
+
+You can extend this project on your side to make it more interesting with any machine learning framework or other. here are a few if you are interested
+
+- ### [wit.ai](https://wit.ai/): Wit.ai makes it easy for developers to build applications and devices that you can talk or text to.
+
+- ### [Rasa](https://rasa.com/open-source/): Rasa Open Source supplies the building blocks for creating virtual assistants. Use Rasa to automate human-to-computer interactions anywhere from websites to social media platforms.
