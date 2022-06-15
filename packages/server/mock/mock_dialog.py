@@ -46,7 +46,7 @@ def read_json(user_language: str) -> dict:
     """
     if dialog_data[user_language] != None:
         return dialog_data[user_language]
-    with open(dialog_files[user_language]) as json_file:
+    with open(dialog_files[user_language], encoding="utf-8") as json_file:
         data = json.load(json_file)
         dialog_data[user_language] = data
 
