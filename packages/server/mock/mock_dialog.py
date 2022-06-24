@@ -7,7 +7,7 @@ import emoji
 import env
 import wikipedia
 import logging
-import googlesearch
+import mock.googlesearch as googlesearch
 
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.INFO)
