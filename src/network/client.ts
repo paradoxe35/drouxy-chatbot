@@ -23,12 +23,12 @@ class Client {
   private authenticatedUser: IAuthenticatedUser | null = null;
   public has_initial_messages: boolean = false;
 
-  public languages: { value: string; name: string }[] = [
+  public readonly languages: { value: string; name: string }[] = [
     { value: "en", name: "English" },
     { value: "fr", name: "Français" },
   ];
 
-  private sessionStorageKey = "dxr_authenticated";
+  private readonly sessionStorageKey = "dxr_authenticated";
 
   private readonly stores = {
     userLiveMessage,
